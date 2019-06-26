@@ -1,0 +1,3 @@
+[submodule "submodules\\PasswordManagerTools"]
+	path = submodules\\PasswordManagerTools
+	url = https://github.com/dkvz/PasswordManagerTools

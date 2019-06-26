@@ -9,6 +9,22 @@ dotnet new razor
 ```
 And this is where I should probably have used PascalCase for the root directory. I also found out I probably should have created a sln and multiple projects inside that sln. Oh well.
 
+I added the CLI project I started that has some of the model classes using a git submodule (I'm so sorry) into the submodules folder.
+
+**Make sure to manually checkout the submodule directory or nothing will work**.
+
+Then added the project to the main .csproj using:
+```
+dotnet add reference submodules/PasswordManagerTools/PasswordManagerTools.csproj
+```
+
+We then need to tell the compiler to stop trying to watch all the files inside submodules, which is achieved by adding this to our main csproj:
+```xml
+<PropertyGroup>
+  <DefaultItemExcludes>$(DefaultItemExcludes);submodules\**</DefaultItemExcludes>
+</PropertyGroup>
+```
+
 To run the project:
 ```
 dotnet watch run
