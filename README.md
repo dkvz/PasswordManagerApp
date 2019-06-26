@@ -65,3 +65,6 @@ I created a controller called `PrivateController` to help testing stuff.
 
 ## Questions
 * Where (which directory) do you put these "service" classes that can be injected in controllers (and other things I imagine)?
+
+# TODO
+- [ ] Remove the old project from Github.
