@@ -30,7 +30,46 @@ To run the project:
 dotnet watch run
 ```
 
-## Layout modification
+## Building for production
+Use the following to create a Windows exe:
+```
+dotnet publish --configuration Release -r win-x64
+```
+
+The command initially gave me an error in that it was supposed to use donet Core 2.2.0 but would be using 2.2.2 instead.
+
+There are two possible fixes in the .csproj. The first one is to specify both the target runtime version, and the runtime identifies you want to use. They provided the following example (supposed to go in the first PropertyGroup):
+
+```
+<RuntimeFrameworkVersion>2.1.1</RuntimeFrameworkVersion>
+<PlatformTarget>AnyCPU</PlatformTarget>
+<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+```
+
+What I'm doing it just adding the following line:
+```
+<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+```
+
+Actually it took me forever to notice the issue came from the submodule .csproj, the PasswordManagerTools project.
+
+I just had to also add the TargetLatestRuntimePatch to the .csproj over there and publish worked.
+
+Except my app still redirects to HTTPS, so I commented the line that does that in Startup.cs.
+More importantly, the static assets are not there at all.
+
+For what I want to do I'm pretty sure I need to use OutOfProcess hosting and not InProcess (which means we're supposed to put it inside IIS or something). OutOfProcess is supposed to be the default and uh... Yeah I'm not sure if it's even using that option but let's overwrite it anyway in the csproj:
+```
+<AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+```
+
+The static content is still absent from the exe. I found [a page](https://www.learnrazorpages.com/publishing/publish-to-iis#including-static-content-in-the-root-folder) that seems to explain my issue.
+
+The "good" news is that this confirms the app is not bundling/minifying anything in that state. It's possible to add a NuGet package to do it, or we do it ourselves. It could even be done in a separate project.
+
+I'm going to need npm for client encryption packages so I might as well setup a bundler like Parcel. More on that later.
+
+## Layout modifications
 I had to heavily modify the existing pages since I don't want Bootstrap, JQuery etc.
 
 The `_Layout.cshtml` file had these entries in head:
@@ -120,8 +159,8 @@ We should then create the Query and Mutation objects resolvers thingies accessor
 
 And finally: Models/PasswordManagerSchema.
 
-## The controllers
-I created a controller called `PrivateController` to help testing stuff.
+## Assets bundling
+
 
 ## Questions
 * Where (which directory) do you put these "service" classes that can be injected in controllers (and other things I imagine)?

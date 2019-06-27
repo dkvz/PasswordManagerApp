@@ -27,3 +27,4 @@ msbuild.wrn
 
 # My stuff
 var/
+node_modules
