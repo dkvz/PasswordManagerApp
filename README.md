@@ -127,5 +127,8 @@ I created a controller called `PrivateController` to help testing stuff.
 * Where (which directory) do you put these "service" classes that can be injected in controllers (and other things I imagine)?
 
 # TODO
-- [ ] Remove the old project from Github.
+- [x] Remove the old project from Github -> Made it private.
 - [ ] Check if the CSS and JS gets minified in the default prod build, I'm not sure it does (it did in the previous Razor template).
+- [x] Use CSS variables while I'm at it.
+- [ ] There doesn't seem to be a handler for error 404s.
+- [ ] Email notifications for failed login attempts, log all the successful logins somewhere.
