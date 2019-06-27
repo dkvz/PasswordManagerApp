@@ -35,6 +35,7 @@ Use the following to create a Windows exe:
 ```
 dotnet publish --configuration Release -r win-x64
 ```
+The build is in the `bin/Release/netcoreapp2.2/<TARGET>/publish directory`. There are a lot of files in there, one of which is executable.
 
 The command initially gave me an error in that it was supposed to use donet Core 2.2.0 but would be using 2.2.2 instead.
 
@@ -160,7 +161,25 @@ We should then create the Query and Mutation objects resolvers thingies accessor
 And finally: Models/PasswordManagerSchema.
 
 ## Assets bundling
+I think the easiest plan is to npm init the project directory and reference bundled files in `_Layout.cshtml` in the link and script tags (output to wwwroot and the right subdirectories).
 
+We should then be able to rely on the `asp-append-version="true"` to help us with cache busting as it adds a ?v= query to the URL. We'll have to check if that actually works with the release package.
+
+I think it's possible to create tasks to run before `dotnet build` takes place but we might as well do everything from npm.
+
+I need to include wwwroot to the final build. There is a Folder entry to add to the csproj as shown in [this example](https://github.com/NetCoreTemplates/parcel/blob/master/MyApp/MyApp.csproj).
+
+So I added this section to my csproj:
+```xml
+<ItemGroup>
+  <Folder Include="wwwroot\" />
+</ItemGroup>
+```
+
+For future reference, if we want to use the bundler to add a version string and include that script regardless of the version or hash it's possible too, using a tag such as:
+```html
+<script asp-src-include="~/js/app_*.js"></script>
+```
 
 ## Questions
 * Where (which directory) do you put these "service" classes that can be injected in controllers (and other things I imagine)?
@@ -171,3 +190,4 @@ And finally: Models/PasswordManagerSchema.
 - [x] Use CSS variables while I'm at it.
 - [ ] There doesn't seem to be a handler for error 404s.
 - [ ] Email notifications for failed login attempts, log all the successful logins somewhere.
+- [x] The `asp-append-version="true"` thing doesn't work at all with the production release, the version ID's are gone. -> It does work, the correct exe is in PasswordManagerApp\bin\Release\netcoreapp2.2\win-x64\publish or equivalent.
