@@ -25,9 +25,24 @@ We then need to tell the compiler to stop trying to watch all the files inside s
 </PropertyGroup>
 ```
 
+## Dependencies
+You need NodeJS 10+.
+
+I use Parcel.JS to bundle static assets. Since Parcel weighs more than 90MB I started installing it globally, so it's not in package.json and is called through npx.
+
+Make sure parcel is installed globally:
+```
+npm install -g parcel-bundler
+```
+
+## Configuration
+
+
+## Running the project
+
 To run the project:
 ```
-dotnet watch run
+npm run dev
 ```
 
 ## Building for production
@@ -41,14 +56,14 @@ The command initially gave me an error in that it was supposed to use donet Core
 
 There are two possible fixes in the .csproj. The first one is to specify both the target runtime version, and the runtime identifies you want to use. They provided the following example (supposed to go in the first PropertyGroup):
 
-```
+```xml
 <RuntimeFrameworkVersion>2.1.1</RuntimeFrameworkVersion>
 <PlatformTarget>AnyCPU</PlatformTarget>
 <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 ```
 
 What I'm doing it just adding the following line:
-```
+```xml
 <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
 ```
 
@@ -60,7 +75,7 @@ Except my app still redirects to HTTPS, so I commented the line that does that i
 More importantly, the static assets are not there at all.
 
 For what I want to do I'm pretty sure I need to use OutOfProcess hosting and not InProcess (which means we're supposed to put it inside IIS or something). OutOfProcess is supposed to be the default and uh... Yeah I'm not sure if it's even using that option but let's overwrite it anyway in the csproj:
-```
+```xml
 <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
 ```
 
@@ -180,6 +195,13 @@ For future reference, if we want to use the bundler to add a version string and 
 ```html
 <script asp-src-include="~/js/app_*.js"></script>
 ```
+
+### Parcel
+I thought of using Rollup this time but I just reverted to Parcel.
+
+What we want to do is create some sort of source directory that outputs to wwwroot. I chose to use "src" although it's a tiny bit confusing.
+
+We can import the CSS in the JS entry point and Parcel will output a CSS file as well.
 
 ## Questions
 * Where (which directory) do you put these "service" classes that can be injected in controllers (and other things I imagine)?
