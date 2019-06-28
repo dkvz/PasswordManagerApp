@@ -203,6 +203,21 @@ What we want to do is create some sort of source directory that outputs to wwwro
 
 We can import the CSS in the JS entry point and Parcel will output a CSS file as well.
 
+The "src" directory should be ignored by the dotnet compiler, which we can ensure it is by modifying the DefaultItemExclude (that we should already have since we also exclude "submodules"):
+
+```xml
+<PropertyGroup>
+  <DefaultItemExcludes>$(DefaultItemExcludes);submodules\**;src\**</DefaultItemExcludes>
+</PropertyGroup>
+```
+
+## Client-side encryption
+I'm going to have to be able to encrypt and decrypt similarily between my two different AES libraries.
+
+In JS I think I'm going to use the [aes-js](https://www.npmjs.com/package/aes-js) package.
+
+
+
 ## Questions
 * Where (which directory) do you put these "service" classes that can be injected in controllers (and other things I imagine)?
 
