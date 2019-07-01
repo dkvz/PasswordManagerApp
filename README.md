@@ -216,7 +216,15 @@ I'm going to have to be able to encrypt and decrypt similarily between my two di
 
 In JS I think I'm going to use the [aes-js](https://www.npmjs.com/package/aes-js) package.
 
+I carried out experiments on [another repository](https://github.com/dkvz/node-encryption-experiment) although this is specific to Node and will have to be adapted to the browser. We'll also need to check for the presence of the window.crypto API.
 
+-> I put the unsupported browser check in Index.cshtml.
+
+We need a few libraries for which we add a specific version:
+```
+npm install -D --save-exact aes-js@3.1.2
+npm install -D --save-exact pbkdf2@3.0.17
+```
 
 ## Questions
 * Where (which directory) do you put these "service" classes that can be injected in controllers (and other things I imagine)?
@@ -228,3 +236,5 @@ In JS I think I'm going to use the [aes-js](https://www.npmjs.com/package/aes-js
 - [ ] There doesn't seem to be a handler for error 404s.
 - [ ] Email notifications for failed login attempts, log all the successful logins somewhere.
 - [x] The `asp-append-version="true"` thing doesn't work at all with the production release, the version ID's are gone. -> It does work, the correct exe is in PasswordManagerApp\bin\Release\netcoreapp2.2\win-x64\publish or equivalent.
+- [ ] I have a 404 on the source maps - They don't seem to be available through Kestrel, probably because they're referenced as being at the root in the files (as in /sites.css.map instead of /assets/sites.css/map).
+- [ ] Add Babel just for the fun of it and also because my cheap browser check in Index.cshtml encompasses browsers that have no ES6 support.

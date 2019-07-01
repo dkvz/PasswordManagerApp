@@ -11,3 +11,12 @@
 <div class="sequence-grid">
 
 </div>
+
+@section Scripts {
+  <script>
+  if (!window.Uint8Array || !window.crypto)  {
+    console.log(window.location.href);
+    window.location.href = '/unsupported';
+  }
+  </script>
+}

@@ -20,8 +20,9 @@
   },
   "homepage": "https://github.com/dkvz/PasswordManagerApp#readme",
   "devDependencies": {
-    "aes-js": "^3.1.2",
+    "aes-js": "3.1.2",
     "concurrently": "^4.1.1",
-    "cssnano": "^4.1.10"
+    "cssnano": "^4.1.10",
+    "pbkdf2": "3.0.17"
   }
 }

@@ -1,4 +1,4 @@
 import './css/site.css';
-import aesjs from 'aes-js';
+import aes from './aes';
 
-console.log(aesjs);
+console.log(aes.randomBytes(16));
