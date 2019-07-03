@@ -13,8 +13,11 @@ namespace PasswordManagerApp.Models
     // Maybe. I don't know.
     public const int MAX_SESSION_AGE = 15;
     public List<SecureSession> Sessions { get; set; }
+
+    public int Count => Sessions.Count;
+
     private bool _cleaningUp = false;
-    private TimeSpan _max_age = new TimeSpan(0, SessionManager.MAX_SESSION_AGE, 0);
+    private TimeSpan _max_age = TimeSpan.FromMinutes(SessionManager.MAX_SESSION_AGE);
 
     public SessionManager() 
     {
