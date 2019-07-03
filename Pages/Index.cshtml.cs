@@ -11,13 +11,16 @@ namespace PasswordManagerApp.Pages
   public class IndexModel : PageModel
   {
     private readonly ISessionManager _sessionManager;
+    public SecureSession Session { get; set; }
     public IndexModel(ISessionManager sessionManager)
     {
       _sessionManager = sessionManager;
     }
     public void OnGet()
     {
-      Console.WriteLine(_sessionManager.CreateSession());
+      Session = _sessionManager.CreateSession(
+        Request.HttpContext.Connection.RemoteIpAddress
+      );
     }
   }
 }

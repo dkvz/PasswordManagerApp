@@ -1,7 +1,9 @@
+using System.Net;
+
 namespace PasswordManagerApp.Models 
 {
   public interface ISessionManager
   {
-    int CreateSession();
+    SecureSession CreateSession(IPAddress clientIp);
   }
 }

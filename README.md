@@ -226,6 +226,11 @@ npm install -D --save-exact aes-js@3.1.2
 npm install -D --save-exact pbkdf2@3.0.17
 ```
 
+## Sessions cleanup
+I'm implementing my own session mechanic using a singleton that stays in memory for the app lifetime.
+
+For the automatic cleaning up I should look up background tasks: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-2.2
+
 ## Questions
 * Where (which directory) do you put these "service" classes that can be injected in controllers (and other things I imagine)?
 
@@ -238,3 +243,6 @@ npm install -D --save-exact pbkdf2@3.0.17
 - [x] The `asp-append-version="true"` thing doesn't work at all with the production release, the version ID's are gone. -> It does work, the correct exe is in PasswordManagerApp\bin\Release\netcoreapp2.2\win-x64\publish or equivalent.
 - [ ] I have a 404 on the source maps - They don't seem to be available through Kestrel, probably because they're referenced as being at the root in the files (as in /sites.css.map instead of /assets/sites.css/map).
 - [ ] Add Babel just for the fun of it and also because my cheap browser check in Index.cshtml encompasses browsers that have no ES6 support.
+- [ ] Double check if the ClientIP we save in SecureSession objects works with X-Forwarded-For when deployed in production, because there's some chance it doesn't.
+- [ ] Uses or Random in PasswordManagerTools should be replaced with the secured version - It's a TODO item in that project as well.
+- [ ] SessionManager is not thread safe. But I think that would be one of the worst cost/benefit change I could make.
