@@ -30,3 +30,5 @@ var/
 node_modules
 .cache
 wwwroot/assets
+appsettings.production.json
+appsettings.Production.json

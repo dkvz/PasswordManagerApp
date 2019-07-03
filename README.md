@@ -231,8 +231,50 @@ I'm implementing my own session mechanic using a singleton that stays in memory 
 
 For the automatic cleaning up I should look up background tasks: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-2.2
 
-## Questions
-* Where (which directory) do you put these "service" classes that can be injected in controllers (and other things I imagine)?
+## App. configuration file
+I'm probably going to need some way to configure the password database paths (app will allow declaring multiple ones).
+
+[This Stackoverflow answer](https://stackoverflow.com/questions/31453495/how-to-read-appsettings-values-from-json-file-in-asp-net-core) offers a lot of details including how to to dependency injection of the config object.
+
+And the official documentation: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-2.2
+
+It's possible to create one config file per environment (dev and prod that is). I'm probably going to do that and let people create the prod config file.
+
+Btw the sequence is supposed to be a secret. Not as secret as the master password, but still secret. Hide the one you use in prod and change it sometimes.
+
+The dataPath key identifies where the data files are supposed to be stored.
+
+```json
+{
+  "sequence":"2,1;2,2;2,3",
+  "dataPath": "var/data/",
+  "dataFiles": [
+    "main.pwd"
+  ]
+}
+```
+
+Since we use `CreateDefaultBuilder` in Startup.cs, it's actually supposed to automatically pick up all the appsettings.json files (base one which would have priority when they get merged (I think they get merged?), and the two with environment names).
+
+For some reason the app created the json files when I ran it.
+
+It's possible to manually bind a class to the configuration data (or part of it) but I'm going more generic using a more general way of getting the values as shown in the following example (which should also inject the configuration):
+```cs
+public class IndexModel : PageModel
+{
+  public IndexModel(IConfiguration config)
+  {
+    _config = config;
+  }
+
+  public int NumberConfig { get; private set; }
+
+  public void OnGet()
+  {
+    NumberConfig = _config.GetValue<int>("NumberKey", 99);
+  }
+}
+```
 
 # TODO
 - [x] Remove the old project from Github -> Made it private.
@@ -243,6 +285,6 @@ For the automatic cleaning up I should look up background tasks: https://docs.mi
 - [x] The `asp-append-version="true"` thing doesn't work at all with the production release, the version ID's are gone. -> It does work, the correct exe is in PasswordManagerApp\bin\Release\netcoreapp2.2\win-x64\publish or equivalent.
 - [ ] I have a 404 on the source maps - They don't seem to be available through Kestrel, probably because they're referenced as being at the root in the files (as in /sites.css.map instead of /assets/sites.css/map).
 - [ ] Add Babel just for the fun of it and also because my cheap browser check in Index.cshtml encompasses browsers that have no ES6 support.
-- [ ] Double check if the ClientIP we save in SecureSession objects works with X-Forwarded-For when deployed in production, because there's some chance it doesn't.
+- [ ] Double check if the ClientIp we save in SecureSession objects works with X-Forwarded-For when deployed in production, because there's some chance it doesn't.
 - [ ] Uses or Random in PasswordManagerTools should be replaced with the secured version - It's a TODO item in that project as well.
 - [ ] SessionManager is not thread safe. But I think that would be one of the worst cost/benefit change I could make.
