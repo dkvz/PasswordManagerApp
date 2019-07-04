@@ -288,3 +288,4 @@ public class IndexModel : PageModel
 - [ ] Double check if the ClientIp we save in SecureSession objects works with X-Forwarded-For when deployed in production, because there's some chance it doesn't.
 - [ ] Uses or Random in PasswordManagerTools should be replaced with the secured version - It's a TODO item in that project as well.
 - [ ] SessionManager is not thread safe. But I think that would be one of the worst cost/benefit change I could make.
+- [ ] A cookie called .AspNet.Consent is sent with requests. We might want to get rid of it.

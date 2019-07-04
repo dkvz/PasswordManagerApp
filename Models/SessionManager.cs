@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using Microsoft.Extensions.Configuration;
 
 namespace PasswordManagerApp.Models 
 {
@@ -13,15 +14,15 @@ namespace PasswordManagerApp.Models
     // Maybe. I don't know.
     public const int MAX_SESSION_AGE = 15;
     public List<SecureSession> Sessions { get; set; }
-
     public int Count => Sessions.Count;
-
     private bool _cleaningUp = false;
+    private IConfiguration _config;
     private TimeSpan _max_age = TimeSpan.FromMinutes(SessionManager.MAX_SESSION_AGE);
 
-    public SessionManager() 
+    public SessionManager(IConfiguration config) 
     {
       Sessions = new List<SecureSession>();
+      _config = config;
     }
     public SecureSession CreateSession(IPAddress clientIp) 
     {
