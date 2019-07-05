@@ -8,5 +8,6 @@ namespace PasswordManagerApp.Models
     int Count { get; }
     SecureSession CreateSession(IPAddress clientIp);
     void CleanUpSessions();
+    List<string> GetAvailableDataFiles();
   }
 }

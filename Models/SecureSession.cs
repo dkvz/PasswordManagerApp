@@ -30,9 +30,14 @@ namespace PasswordManagerApp.Models
       Array.Clear(SessionId, 0, SessionId.Length);
     }
 
-    public override string ToString() 
+    public string GetSessionId()
     {
       return Convert.ToBase64String(SessionId);
+    }
+
+    public override string ToString() 
+    {
+      return GetSessionId();
     }
   }
 }
