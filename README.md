@@ -279,6 +279,10 @@ public class IndexModel : PageModel
 ## WHAT NOW
 I have to change how sessions are saved so I can easily find one using hash(hash(sequence) + SessionID). I'm probably going to need a dictionnary using hex representations of the hashes since that's what I'm going to send in JSON.
 
+-> I could use the concurrent Dictionnary!
+-> I should use IDictionnary and then implement in the constructor (using the concurrent one).
+-> Dictionnaries throw errors if you try to add something that already exists.
+
 # TODO
 - [x] Remove the old project from Github -> Made it private.
 - [ ] Check if the CSS and JS gets minified in the default prod build, I'm not sure it does (it did in the previous Razor template).
