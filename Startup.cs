@@ -53,6 +53,8 @@ namespace PasswordManagerApp
         app.UseHsts();
       }
 
+      app.UseStatusCodePages();
+
       //app.UseHttpsRedirection();
       app.UseStaticFiles();
       app.UseCookiePolicy();

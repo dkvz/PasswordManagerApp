@@ -276,16 +276,20 @@ public class IndexModel : PageModel
 }
 ```
 
+## WHAT NOW
+I have to change how sessions are saved so I can easily find one using hash(hash(sequence) + SessionID). I'm probably going to need a dictionnary using hex representations of the hashes since that's what I'm going to send in JSON.
+
 # TODO
 - [x] Remove the old project from Github -> Made it private.
 - [ ] Check if the CSS and JS gets minified in the default prod build, I'm not sure it does (it did in the previous Razor template).
 - [x] Use CSS variables while I'm at it.
-- [ ] There doesn't seem to be a handler for error 404s.
+- [x] There doesn't seem to be a handler for error 404s -> Quick fixed this by adding `app.UseStatusCodePages();``in Startup.cs. Not awesome but it works.
 - [ ] Email notifications for failed login attempts, log all the successful logins somewhere.
 - [x] The `asp-append-version="true"` thing doesn't work at all with the production release, the version ID's are gone. -> It does work, the correct exe is in PasswordManagerApp\bin\Release\netcoreapp2.2\win-x64\publish or equivalent.
-- [ ] I have a 404 on the source maps - They don't seem to be available through Kestrel, probably because they're referenced as being at the root in the files (as in /sites.css.map instead of /assets/sites.css/map).
+- [ ] I have a 404 on the source maps - They don't seem to be available through Kestrel, probably because they're referenced as being at the root in the files (as in /sites.css.map instead of /assets/sites.css/map) (we juste need to add --public-url to parcel).
 - [ ] Add Babel just for the fun of it and also because my cheap browser check in Index.cshtml encompasses browsers that have no ES6 support.
 - [ ] Double check if the ClientIp we save in SecureSession objects works with X-Forwarded-For when deployed in production, because there's some chance it doesn't.
 - [ ] Uses or Random in PasswordManagerTools should be replaced with the secured version - It's a TODO item in that project as well.
 - [ ] SessionManager is not thread safe. But I think that would be one of the worst cost/benefit change I could make.
 - [ ] A cookie called .AspNet.Consent is sent with requests. We might want to get rid of it.
+- [ ] TestRequest.cs should be removed.
