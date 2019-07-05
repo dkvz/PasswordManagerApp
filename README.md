@@ -297,3 +297,4 @@ I have to change how sessions are saved so I can easily find one using hash(hash
 - [ ] SessionManager is not thread safe. But I think that would be one of the worst cost/benefit change I could make.
 - [ ] A cookie called .AspNet.Consent is sent with requests. We might want to get rid of it.
 - [ ] TestRequest.cs should be removed.
+- [ ] Re-test the whole session clean up thing.
