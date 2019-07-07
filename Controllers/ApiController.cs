@@ -21,6 +21,13 @@ namespace PasswordManagerApp.Controllers
   public class ApiController : Controller
   {
 
+    private ISessionManager _sessionManager;
+
+    public ApiController(ISessionManager sessionManager)
+    {
+      _sessionManager = sessionManager;
+    }
+
     [HttpGet]
     public JsonResult Test()
     {
@@ -29,10 +36,14 @@ namespace PasswordManagerApp.Controllers
     }
 
     [HttpPost]
-    public JsonResult Posterz([FromBody]TestRequest pwd)
+    public JsonResult Login([FromBody]LoginRequestBody login)
     {
-      Console.WriteLine($"POSTED DATA HERE: {pwd.Name} - {pwd.Password}");
-      return Json(pwd);
+      // - Check that the session exists
+      // - Check that it's valid for current IP address
+      // -> We then need to call something that will decrypt the file and
+      //    re-encrypt it in the session memory - Try catch that appropriately
+      
+      return Json(login);
     }
 
   }

@@ -6,13 +6,16 @@ namespace PasswordManagerApp.Models.Requests
   [Serializable]
   public class LoginRequestBody
   {
-    public string Name { get; set; }
+    /// SessionId is a hash(hash(sequence) + Original Session ID)
+    public string SessionId { get; set; }
+    /// Encrypted master password
     public string Password { get; set; }
-    public DateTime Date { get; set; }
-    public LoginRequestBody(string name, string password, DateTime date) {
-      Name = name;
+    /// Requested data file
+    public string DataFile { get; set; }
+    public LoginRequestBody(string sessionId, string password, string dataFile) {
+      SessionId = sessionId;
       Password = password;
-      Date = date;
+      DataFile = dataFile;
     }
   }
 }
