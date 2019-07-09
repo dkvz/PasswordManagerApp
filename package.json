@@ -4,7 +4,7 @@
   "description": "Personal Password Manager app. \"database\" is altered using a CLI utility",
   "main": "site.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "dotnet test submodules/Tests",
     "build-assets": "npx parcel build src/site.js -d wwwroot/assets",
     "build-win": "npm run build-assets && dotnet publish --configuration Release -r win-x64",
     "dev": "concurrently -k \"npx parcel watch src/site.js -d wwwroot/assets\" \"dotnet watch run\""

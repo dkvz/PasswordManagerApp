@@ -285,7 +285,33 @@ It's kind of a mess.
 
 It might be possible to include the testing to the same project automatically, I still have to try it.
 
+```
+cd submodules
+mkdir Tests
+cd Tests
+dotnet new nunit
+```
 
+Now we have to reference the test project into the main project (not necessary but will make `dotnet test` work in the root directory) and also reference the razor project from the test project.
+
+I tried adding the reference to the Tests project inside the main csproj but it doesn't make the `dotnet test` command work from the root, so I deleted it.
+
+In Tests.csproj:
+```xml
+<ItemGroup>
+  <ProjectReference Include="../../PasswordManagerApp.csproj" />
+</ItemGroup>
+```
+
+To run the tests I need to do:
+```
+dotnet test submodules/Tests
+```
+
+To make it easier I added that as an npm script and thus can use:
+```
+npm test
+```
 
 # TODO
 - [x] Remove the old project from Github -> Made it private.
