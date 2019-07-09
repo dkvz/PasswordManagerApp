@@ -6,6 +6,7 @@
 using System;
 using System.Net;
 using System.Security.Cryptography;
+using PasswordManager.Security;
 
 namespace PasswordManagerApp.Models 
 {
@@ -15,6 +16,7 @@ namespace PasswordManagerApp.Models
     public IPAddress ClientIp { get; private set; }
     public byte[] SessionId { get; private set; }
     public DateTime Created { get; private set; }
+    public PasswordManagerData Data { get; set; } = null;
 
     public SecureSession(IPAddress clientIp) 
     {
@@ -28,6 +30,7 @@ namespace PasswordManagerApp.Models
     public void Dispose() 
     {
       Array.Clear(SessionId, 0, SessionId.Length);
+      Data = null;
     }
 
     public string GetSessionId()

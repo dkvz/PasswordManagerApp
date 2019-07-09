@@ -32,3 +32,4 @@ node_modules
 wwwroot/assets
 appsettings.production.json
 appsettings.Production.json
+.vscode

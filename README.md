@@ -276,12 +276,16 @@ public class IndexModel : PageModel
 }
 ```
 
-## WHAT NOW
-I have to change how sessions are saved so I can easily find one using hash(hash(sequence) + SessionID). I'm probably going to need a dictionnary using hex representations of the hashes since that's what I'm going to send in JSON.
+## Testing
+It looks like you're normaly supposed to have a separate "test project". I could put it in submodules/ since I'm already using a separate project in there, that should NOT be in there.
 
--> I could use the concurrent Dictionnary!
--> I should use IDictionnary and then implement in the constructor (using the concurrent one).
--> Dictionnaries throw errors if you try to add something that already exists.
+I should've created a "sln" at the start and adding projects to it. Instead I created a project using the "razor" template, and added another in submodules while making sure that directory gets ignored by the compiler for the current project.
+
+It's kind of a mess.
+
+It might be possible to include the testing to the same project automatically, I still have to try it.
+
+
 
 # TODO
 - [x] Remove the old project from Github -> Made it private.
@@ -298,3 +302,4 @@ I have to change how sessions are saved so I can easily find one using hash(hash
 - [ ] A cookie called .AspNet.Consent is sent with requests. We might want to get rid of it.
 - [ ] TestRequest.cs should be removed.
 - [ ] Re-test the whole session clean up thing.
+- [ ] Some of my calls to System.GC are probably completely wrong, they should be on an outer scope where the references I'm trying to clean up are not even accessible.

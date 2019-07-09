@@ -5,6 +5,8 @@ using System.Net;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using PasswordManagerApp.Security;
+using PasswordManager.Security;
+using PasswordManagerApp.Models.Requests;
 
 namespace PasswordManagerApp.Models 
 {
@@ -77,6 +79,34 @@ namespace PasswordManagerApp.Models
     public List<string> GetAvailableDataFiles() 
     {
       return _dataFiles;
+    }
+    public bool OpenSession(LoginRequestBody login)
+    {
+      // Check if we got that session.
+      // Trying to get something that doesn't exist from
+      // a dictionnary throws exceptions. We should actually
+      // do that to be completely thread safe.
+      if (Sessions.ContainsKey(login.SessionId)) 
+      {
+        var sess = Sessions[login.SessionId];
+        // Now try to load the file into the session with
+        // the decrypted password from it:
+        var data = new PasswordManagerData(getFullDataPath(login.DataFile));
+        try 
+        {
+          
+        }
+        catch(Exception ex) 
+        {
+          Console.Error.WriteLine(ex.StackTrace);
+        }
+      }
+      return false;
+      // We should System.GC after calling this.
+    }
+    private string getFullDataPath(string filename)
+    {
+      return _dataPath + filename;
     }
     public void Dispose() 
     {
