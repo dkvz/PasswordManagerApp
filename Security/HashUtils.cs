@@ -47,7 +47,6 @@ namespace PasswordManagerApp.Security
 
     public static byte[] ConcatByteArrays(byte[] a1, byte[] a2)
     {
-      //byte[] ret = new byte[_sequence.Length + sess.SessionId.Length];
       byte[] ret = new byte[a1.Length + a2.Length];
       Array.Copy(a1, ret, a1.Length);
       Array.Copy(a2, 0, ret, a1.Length, a2.Length);
