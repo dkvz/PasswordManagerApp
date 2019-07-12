@@ -89,16 +89,26 @@ namespace PasswordManagerApp.Models
         var sess = Sessions[login.SessionId];
         // Now try to load the file into the session with
         // the decrypted password from it:
-        var data = new PasswordManagerData(getFullDataPath(login.DataFile));
+        sess.Data = new PasswordManagerData(getFullDataPath(login.DataFile));
+        byte[] mPwd = null;
+        byte[] dKey = null;
         try 
         {
-          byte[] dKey = HashUtils.ConcatByteArrays(_sequence, sess.SessionId);
-          string mPwd = AES256.Decrypt(login.Password, dKey);
-          
+          dKey = HashUtils.ConcatByteArrays(_sequence, sess.SessionId);
+          mPwd = AES256.DecryptToByteArray(login.Password, dKey);
+          sess.Data.ReadFromFile(mPwd, dKey);
+          return true;
         }
         catch(Exception ex) 
         {
           Console.Error.WriteLine(ex.StackTrace);
+          sess.Data = null;
+        }
+        finally
+        {
+          // This is a little redundant.
+          if (mPwd != null) HashUtils.ClearByteArray(mPwd);
+          if (dKey != null) HashUtils.ClearByteArray(dKey);
         }
       }
       return false;

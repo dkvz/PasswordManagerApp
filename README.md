@@ -147,6 +147,8 @@ dotnet-aspnet-codegenerator -p "C:\MyProject\MyProject.csproj" controller -name 
 But I think I'm going to skip to GraphQL immediately, see following section.
 
 ## GraphQL
+**NB**: At some point I just decided not to use GraphQL. I have very few endpoints and the convoluted security stuff I'm stringing in would make everything a little too crazy.
+
 We're going to need the NuGET package from here: https://graphql-dotnet.github.io/
 
 We can add the package to the csproj file using the following command:
