@@ -228,6 +228,59 @@ npm install -D --save-exact aes-js@3.1.2
 npm install -D --save-exact pbkdf2@3.0.17
 ```
 
+There is a problem with pbkdf2 which is using Buffer, which does not exist in browsers. It's apparently "polyfilled" by some Browserify addon.
+
+If I really want to use Buffer, [there is a Buffer](https://www.npmjs.com/package/buffer) npm package that looks promising enough.
+
+Or, I might just use something that is native to the crypto API with examples I found here: https://github.com/diafygi/webcrypto-examples#pbkdf2
+
+You need to importKey first, the deriveKey.
+
+I made a horrible pen that seems to work:
+```js
+const key = 'test';
+
+// Need to convert the string to byte array.
+
+// When you're a normal person you use TextEncoder.
+
+const enc = new TextEncoder();
+
+window.crypto.subtle.importKey(
+    "raw", //only "raw" is allowed
+    enc.encode(key), //your password
+    {
+        name: "PBKDF2",
+    },
+    false, //whether the key is extractable (i.e. can be used in exportKey)
+    ["deriveKey", "deriveBits"] //can be any combination of "deriveKey" and "deriveBits"
+)
+.then(function(key){
+    //returns a key object
+    console.log('Imported key: ' + key);
+    window.crypto.subtle.deriveBits(
+    {
+        "name": "PBKDF2",
+        salt: window.crypto.getRandomValues(new Uint8Array(16)),
+        iterations: 10000,
+        hash: {name: "SHA-1"}, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
+    },
+    key, //your key from generateKey or importKey
+    256 //the number of bits you want to derive
+    )
+    .then(function(bits){
+        //returns the derived bits as an ArrayBuffer
+        console.log(new Uint8Array(bits));
+    })
+    .catch(function(err){
+        console.error(err);
+    });
+})
+.catch(function(err){
+    console.error(err);
+});
+```
+
 ## Sessions cleanup
 I'm implementing my own session mechanic using a singleton that stays in memory for the app lifetime.
 
@@ -321,6 +374,7 @@ npm test
 - [x] Use CSS variables while I'm at it.
 - [x] There doesn't seem to be a handler for error 404s -> Quick fixed this by adding `app.UseStatusCodePages();``in Startup.cs. Not awesome but it works.
 - [ ] Email notifications for failed login attempts, log all the successful logins somewhere.
+- [ ] Log all of the attempts somwhere.
 - [x] The `asp-append-version="true"` thing doesn't work at all with the production release, the version ID's are gone. -> It does work, the correct exe is in PasswordManagerApp\bin\Release\netcoreapp2.2\win-x64\publish or equivalent.
 - [ ] I have a 404 on the source maps - They don't seem to be available through Kestrel, probably because they're referenced as being at the root in the files (as in /sites.css.map instead of /assets/sites.css/map) (we juste need to add --public-url to parcel).
 - [ ] Add Babel just for the fun of it and also because my cheap browser check in Index.cshtml encompasses browsers that have no ES6 support.

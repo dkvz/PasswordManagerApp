@@ -1,6 +1,7 @@
 import aesjs from 'aes-js';
 import pbkdf2 from 'pbkdf2';
 import { Uint8ArrayToBase64, base64ToUint8Array } from './b64Uint8ArrayConversions';
+const Buffer = require('buffer/').Buffer;
 
 export default {
   crypto: (self.crypto || self.msCrypto),
@@ -20,8 +21,8 @@ export default {
       // We want to output a base64 string in the end.
       // I should probably document the specificities of the encryption 
       // somewhere though it can all be found here, basically.
-      const iv = this.randomBytes(this.blockBytes);
-      const salt = this.randomBytes(this.saltBytes);
+      const iv = this.randomBytes(this.ivBytes);
+      const salt = new Buffer(this.randomBytes(this.saltBytes));
       pbkdf2.pbkdf2(password, salt, 10000, 32, 'sha1', (err, dKey) => {
         if (err) reject(err);
         else {

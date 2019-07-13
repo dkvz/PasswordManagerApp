@@ -42,7 +42,7 @@ namespace PasswordManagerApp.Controllers
       // - Check that it's valid for current IP address
       // -> We then need to call something that will decrypt the file and
       //    re-encrypt it in the session memory - Try catch that appropriately
-      
+
       // See JS function postLogin in api.js as to what is going
       // to use this endpoint.
 
@@ -50,37 +50,48 @@ namespace PasswordManagerApp.Controllers
 
       try
       {
-        var result = _sessionManager.OpenSession(
-          login, 
-          Request.HttpContext.Connection.RemoteIpAddress
-        );
-        // We should consider invalid IP address and invalid session to be
-        // the same thing as far as the result status goes.
-        switch(result) 
+        // Check if the request body is valid:
+        if (login != null)
         {
-          case OpenSessionResult.DataFileError:
-          case OpenSessionResult.InvalidPasswordOrFSError:
-            res.Value = new {result = "Invalid password or data file error"};
-            res.StatusCode = 403;
-            break;
-          case OpenSessionResult.InvalidSessionId:
-            res.Value = new {result = "Invalid session ID"};
-            res.StatusCode = 401;
-            break;
-          case OpenSessionResult.Success:
-            res.Value = new {result = "Success"};
-            res.StatusCode = 200;
-            break;
-          default:
-            res.Value = new {result = "Unknown error"};
-            res.StatusCode = 403;
-            break;
+          var result = _sessionManager.OpenSession(
+            login,
+            Request.HttpContext.Connection.RemoteIpAddress
+          );
+          // We should consider invalid IP address and invalid session to be
+          // the same thing as far as the result status goes.
+          switch (result)
+          {
+            case OpenSessionResult.DataFileError:
+            case OpenSessionResult.InvalidPasswordOrFSError:
+              res.Value = new { result = "Invalid password or data file error" };
+              res.StatusCode = 403;
+              break;
+            case OpenSessionResult.InvalidSessionId:
+              res.Value = new { result = "Invalid session ID" };
+              res.StatusCode = 401;
+              break;
+            case OpenSessionResult.Success:
+              res.Value = new { result = "Success" };
+              res.StatusCode = 200;
+              break;
+            default:
+              res.Value = new { result = "Unknown error" };
+              res.StatusCode = 403;
+              break;
+          }
+        }
+        else
+        {
+          res.Value = new { result = "Invalid arguments" };
+          res.StatusCode = 400;
         }
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
-        Console.WriteLine(ex.StackTrace);
-        res.Value = new {result = "Server error"};
+        Console.Error.WriteLine("Error when opening session");
+        Console.Error.WriteLine(ex.StackTrace);
+        Console.Error.WriteLine(ex.ToString());
+        res.Value = new { result = "Server error" };
         res.StatusCode = 500;
       }
 

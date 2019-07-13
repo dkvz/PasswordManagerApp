@@ -58,7 +58,7 @@ if (loginForm) {
               dataFile.selectedIndex
             )
             .then(() => console.log('Login success!'))
-            .catch(() => console.log('Login error'));
+            .catch((err) => console.log(`Login error: ${err}`));
           });
       });
   });
