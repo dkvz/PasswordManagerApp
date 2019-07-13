@@ -4,14 +4,31 @@
   ViewData["Title"] = "Login";
 }
 
-<div>
-  <input type="password" placeholder="Master Password" id="masterPassword" name="masterPassword" />
-  <input type="hidden" value="@Model.Session" />
-</div>
+<form id="loginForm">
+  <div>
+    <label for="dataFile">Data file:</label>
+    <select id="dataFile">
+      @foreach (var file in Model.DataFiles)
+      {
+        <option>@file</option>
+      }
+    </select>
+  </div>
 
-<div class="sequence-grid">
+  <div>
+    <input type="password" placeholder="Master Password" id="masterPassword" name="masterPassword" />
+    <input type="hidden" value="@Model.Session" />
+  </div>
 
-</div>
+  <div class="sequence-grid">
+    
+  </div>
+
+  <div>
+    <button type="submit">Confirm</button>
+    <button type="reset" id="resetBtn">Reset</button>
+  </div>
+</form>
 
 @section Scripts {
   <script>

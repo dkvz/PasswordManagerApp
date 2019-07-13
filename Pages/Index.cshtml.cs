@@ -12,9 +12,11 @@ namespace PasswordManagerApp.Pages
   {
     private readonly ISessionManager _sessionManager;
     public SecureSession Session { get; set; }
+    public List<string> DataFiles { get; set; }
     public IndexModel(ISessionManager sessionManager)
     {
       _sessionManager = sessionManager;
+      DataFiles = _sessionManager.GetAvailableDataFiles();
     }
     public void OnGet()
     {

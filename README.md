@@ -331,3 +331,5 @@ npm test
 - [ ] TestRequest.cs should be removed.
 - [ ] Re-test the whole session clean up thing.
 - [ ] Some of my calls to System.GC are probably completely wrong, they should be on an outer scope where the references I'm trying to clean up are not even accessible.
+- [ ] The file selected at login has to be sanitized before it's used on the backend. We should probably just send the position in the list.
+- [ ] Change the title when the view changes.
