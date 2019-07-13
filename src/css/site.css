@@ -32,9 +32,15 @@ body > main {
   margin-bottom: 1rem;
 }
 
-body > main, main > form {
+body > main, .flex-form, .sequence-grid {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.sequence-grid .sequence-grid-row {
+  display: flex;
   align-items: center;
   justify-content: center;
 }

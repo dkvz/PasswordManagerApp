@@ -13,10 +13,14 @@ namespace PasswordManagerApp.Pages
     private readonly ISessionManager _sessionManager;
     public SecureSession Session { get; set; }
     public List<string> DataFiles { get; set; }
+    public int GridWidth { get; set; }
+    public int GridHeight { get; set; }
     public IndexModel(ISessionManager sessionManager)
     {
       _sessionManager = sessionManager;
       DataFiles = _sessionManager.GetAvailableDataFiles();
+      GridHeight = _sessionManager.GridHeight;
+      GridWidth = _sessionManager.GridWidth;
     }
     public void OnGet()
     {

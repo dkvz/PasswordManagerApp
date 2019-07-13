@@ -25,6 +25,8 @@ namespace PasswordManagerApp.Models
     */
     public IDictionary<string, SecureSession> Sessions { get; set; }
     public int Count => Sessions.Count;
+    public int GridWidth { get; private set; }
+    public int GridHeight { get; private set; }
     private bool _cleaningUp = false;
     private IConfiguration _config;
     private TimeSpan _max_age = TimeSpan.FromMinutes(SessionManager.MAX_SESSION_AGE);
@@ -43,6 +45,21 @@ namespace PasswordManagerApp.Models
       _sequence = HashUtils.HashStringToBytes(sequence);
       if (files != null) _dataFiles = files;
       else _dataFiles = new List<string>();
+      // Get the sequence grid dimensions from config:
+      string[] dims = (_config.GetValue<string>("sequenceGridSize") ?? "3x3").Split('x');
+      try 
+      {
+        if (dims.Length == 2)
+        {
+          GridWidth = int.Parse(dims[0]);
+          GridHeight = int.Parse(dims[1]);
+        }
+        else throw new FormatException("Invalid sequence grid dimensions in config file");
+      } catch (FormatException)
+      {
+        GridHeight = 3;
+        GridWidth = 3;
+      }
     }
     public SecureSession CreateSession(IPAddress clientIp) 
     {

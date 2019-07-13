@@ -4,31 +4,43 @@
   ViewData["Title"] = "Login";
 }
 
-<form id="loginForm">
-  <div>
-    <label for="dataFile">Data file:</label>
-    <select id="dataFile">
-      @foreach (var file in Model.DataFiles)
-      {
-        <option>@file</option>
-      }
-    </select>
-  </div>
+<div class="slides-container">
+  <section>
+    <form id="loginForm" class="flex-form">
+      <div>
+        <label for="dataFile">Data file:</label>
+        <select id="dataFile">
+          @foreach (var file in Model.DataFiles)
+          {
+            <option>@file</option>
+          }
+        </select>
+      </div>
 
-  <div>
-    <input type="password" placeholder="Master Password" id="masterPassword" name="masterPassword" />
-    <input type="hidden" value="@Model.Session" />
-  </div>
+      <div>
+        <input type="password" placeholder="Master Password" id="masterPassword" name="masterPassword" />
+        <input type="hidden" value="@Model.Session" />
+      </div>
 
-  <div class="sequence-grid">
-    
-  </div>
+      <div class="sequence-grid">
+        @for(int y = 0; y < Model.GridHeight; y++)
+        {
+          <div class="sequence-grid-row">
+            @for(int x = 0; x < Model.GridWidth; x++)
+            {
+              <button type="button" data-y="@y" data-x="@x">&nbsp;</button>
+            }
+          </div>
+        }
+      </div>
 
-  <div>
-    <button type="submit">Confirm</button>
-    <button type="reset" id="resetBtn">Reset</button>
-  </div>
-</form>
+      <div>
+        <button type="submit">Confirm</button>
+        <button type="reset" id="resetBtn">Reset</button>
+      </div>
+    </form>
+  </section>
+</div>
 
 @section Scripts {
   <script>
