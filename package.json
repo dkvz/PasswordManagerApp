@@ -5,9 +5,9 @@
   "main": "site.js",
   "scripts": {
     "test": "dotnet test submodules/Tests",
-    "build-assets": "npx parcel build src/site.js -d wwwroot/assets",
+    "build-assets": "npx parcel build src/site.js -d wwwroot/assets --public-url /assets",
     "build-win": "npm run build-assets && dotnet publish --configuration Release -r win-x64",
-    "dev": "concurrently -k \"npx parcel watch src/site.js -d wwwroot/assets\" \"dotnet watch run\""
+    "dev": "concurrently -k \"npx parcel watch src/site.js -d wwwroot/assets --public-url /assets\" \"dotnet watch run\""
   },
   "repository": {
     "type": "git",
