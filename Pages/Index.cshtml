@@ -19,7 +19,7 @@
 
       <div class="flex-form-row">
         <input type="password" placeholder="Master Password" id="masterPassword" name="masterPassword" />
-        <input type="hidden" value="@Model.Session" />
+        <input type="hidden" value="@Model.Session" id="sessionId" />
       </div>
 
       <div class="sequence-grid">
@@ -41,13 +41,13 @@
     </form>
   </section>
   <section class="future">
-
+    <h1>Slide 2</h1>
   </section>
 </div>
 
 @section Scripts {
   <script>
-  if (!window.Uint8Array || !window.crypto) {
+  if (!window.Uint8Array || !window.crypto || !window.crypto.subtle || !window.fetch) {
     console.log(window.location.href);
     window.location.href = '/unsupported';
   }

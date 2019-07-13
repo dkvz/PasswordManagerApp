@@ -11,8 +11,8 @@ namespace PasswordManagerApp.Models.Requests
     /// Encrypted master password
     public string Password { get; set; }
     /// Requested data file
-    public string DataFile { get; set; }
-    public LoginRequestBody(string sessionId, string password, string dataFile) {
+    public int DataFile { get; set; }
+    public LoginRequestBody(string sessionId, string password, int dataFile) {
       SessionId = sessionId;
       Password = password;
       DataFile = dataFile;

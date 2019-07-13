@@ -8,7 +8,7 @@ using PasswordManagerApp.Security;
 using PasswordManager.Security;
 using PasswordManagerApp.Models.Requests;
 
-namespace PasswordManagerApp.Models 
+namespace PasswordManagerApp.Models
 {
   /**
     Not thread safe. But I don't really care.
@@ -34,7 +34,7 @@ namespace PasswordManagerApp.Models
     private string _dataPath;
     private byte[] _sequence;
 
-    public SessionManager(IConfiguration config) 
+    public SessionManager(IConfiguration config)
     {
       Sessions = new ConcurrentDictionary<string, SecureSession>();
       _config = config;
@@ -47,7 +47,7 @@ namespace PasswordManagerApp.Models
       else _dataFiles = new List<string>();
       // Get the sequence grid dimensions from config:
       string[] dims = (_config.GetValue<string>("sequenceGridSize") ?? "3x3").Split('x');
-      try 
+      try
       {
         if (dims.Length == 2)
         {
@@ -55,16 +55,17 @@ namespace PasswordManagerApp.Models
           GridHeight = int.Parse(dims[1]);
         }
         else throw new FormatException("Invalid sequence grid dimensions in config file");
-      } catch (FormatException)
+      }
+      catch (FormatException)
       {
         GridHeight = 3;
         GridWidth = 3;
       }
     }
-    public SecureSession CreateSession(IPAddress clientIp) 
+    public SecureSession CreateSession(IPAddress clientIp)
     {
       var sess = new SecureSession(clientIp);
-      
+
       // At some point Sessions was a List
       //Sessions.Add(sess);
 
@@ -78,64 +79,83 @@ namespace PasswordManagerApp.Models
       HashUtils.ClearByteArray(hashedId);
       return sess;
     }
-    public void CleanUpSessions() 
+    public void CleanUpSessions()
     {
       if (!_cleaningUp)
       {
         _cleaningUp = true;
         //Sessions.RemoveAll(s => DateTime.Now - s.Created > _max_age);
-        foreach(var kp in Sessions.Where(s => DateTime.Now - s.Value.Created > _max_age))
+        foreach (var kp in Sessions.Where(s => DateTime.Now - s.Value.Created > _max_age))
         {
           Sessions.Remove(kp.Key);
         }
         _cleaningUp = false;
       }
     }
-    public List<string> GetAvailableDataFiles() 
+    public List<string> GetAvailableDataFiles()
     {
       return _dataFiles;
     }
-    public bool OpenSession(LoginRequestBody login)
+    public OpenSessionResult OpenSession(LoginRequestBody login, IPAddress clientIp)
     {
       // Check if we got that session.
       // Trying to get something that doesn't exist from
       // a dictionnary throws exceptions. We should actually
       // do that to be completely thread safe.
-      if (Sessions.ContainsKey(login.SessionId)) 
+      if (Sessions.ContainsKey(login.SessionId))
       {
         var sess = Sessions[login.SessionId];
-        // Now try to load the file into the session with
-        // the decrypted password from it:
-        sess.Data = new PasswordManagerData(getFullDataPath(login.DataFile));
-        byte[] mPwd = null;
-        byte[] dKey = null;
-        try 
+        // Check if the IP address is correct:
+        if (sess.ClientIp.Equals(clientIp))
         {
-          dKey = HashUtils.ConcatByteArrays(_sequence, sess.SessionId);
-          mPwd = AES256.DecryptToByteArray(login.Password, dKey);
-          sess.Data.ReadFromFile(mPwd, dKey);
-          return true;
+          // Now try to load the file into the session with
+          // the decrypted password from it:
+          if (login.DataFile >= 0 && _dataFiles.Count >= login.DataFile)
+          {
+            sess.Data = new PasswordManagerData(getFullDataPath(_dataFiles[login.DataFile]));
+            byte[] mPwd = null;
+            byte[] dKey = null;
+            try
+            {
+              dKey = HashUtils.ConcatByteArrays(_sequence, sess.SessionId);
+              mPwd = AES256.DecryptToByteArray(login.Password, dKey);
+              sess.Data.ReadFromFile(mPwd, dKey);
+              return OpenSessionResult.Success;
+            }
+            catch (Exception ex)
+            {
+              Console.Error.WriteLine(ex.StackTrace);
+              sess.Data = null;
+              return OpenSessionResult.InvalidPasswordOrFSError;
+            }
+            finally
+            {
+              // This is a little redundant.
+              if (mPwd != null) HashUtils.ClearByteArray(mPwd);
+              if (dKey != null) HashUtils.ClearByteArray(dKey);
+            }
+          }
+          else
+          {
+            return OpenSessionResult.DataFileError;
+          }
         }
-        catch(Exception ex) 
+        else
         {
-          Console.Error.WriteLine(ex.StackTrace);
-          sess.Data = null;
-        }
-        finally
-        {
-          // This is a little redundant.
-          if (mPwd != null) HashUtils.ClearByteArray(mPwd);
-          if (dKey != null) HashUtils.ClearByteArray(dKey);
+          return OpenSessionResult.IpAddressNotAllowed;
         }
       }
-      return false;
+      else
+      {
+        return OpenSessionResult.InvalidSessionId;
+      }
       // We should System.GC after calling this.
     }
     private string getFullDataPath(string filename)
     {
       return _dataPath + filename;
     }
-    public void Dispose() 
+    public void Dispose()
     {
       Sessions.ToList().ForEach(kp => kp.Value.Dispose());
       Sessions.Clear();

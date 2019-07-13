@@ -43,7 +43,48 @@ namespace PasswordManagerApp.Controllers
       // -> We then need to call something that will decrypt the file and
       //    re-encrypt it in the session memory - Try catch that appropriately
       
-      return Json(login);
+      // See JS function postLogin in api.js as to what is going
+      // to use this endpoint.
+
+      var res = new JsonResult(null);
+
+      try
+      {
+        var result = _sessionManager.OpenSession(
+          login, 
+          Request.HttpContext.Connection.RemoteIpAddress
+        );
+        // We should consider invalid IP address and invalid session to be
+        // the same thing as far as the result status goes.
+        switch(result) 
+        {
+          case OpenSessionResult.DataFileError:
+          case OpenSessionResult.InvalidPasswordOrFSError:
+            res.Value = new {result = "Invalid password or data file error"};
+            res.StatusCode = 403;
+            break;
+          case OpenSessionResult.InvalidSessionId:
+            res.Value = new {result = "Invalid session ID"};
+            res.StatusCode = 401;
+            break;
+          case OpenSessionResult.Success:
+            res.Value = new {result = "Success"};
+            res.StatusCode = 200;
+            break;
+          default:
+            res.Value = new {result = "Unknown error"};
+            res.StatusCode = 403;
+            break;
+        }
+      }
+      catch(Exception ex)
+      {
+        Console.WriteLine(ex.StackTrace);
+        res.Value = new {result = "Server error"};
+        res.StatusCode = 500;
+      }
+
+      return res;
     }
 
   }

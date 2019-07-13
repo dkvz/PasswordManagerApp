@@ -42,7 +42,31 @@ export default {
     return new Promise((resolve, reject) => {
       // We expect payload to be base64.
       
-    })
+    });
+  },
+  /**
+   * Stole this from here: https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+   */
+  hexString: function(buffer) {
+    const byteArray = new Uint8Array(buffer);
+
+    const hexCodes = [...byteArray].map(value => {
+      const hexCode = value.toString(16);
+      const paddedHexCode = hexCode.padStart(2, '0');
+      return paddedHexCode;
+    });
+  
+    return hexCodes.join('');
+  },
+  hash: function(source) {
+    // Source has to be converted ty a byte array.
+    // We can use aesjs.utils.utf8.toBytes.
+    return this.crypto.subtle.digest(
+      'SHA-1',
+      aesjs.utils.utf8.toBytes(source)
+    )
+    .then(value => this.hexString(value))
+    .catch(() => this.hexString(this.randomBytes(20)));
   }
     
 };
