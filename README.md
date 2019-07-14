@@ -387,3 +387,4 @@ npm test
 - [x] The file selected at login has to be sanitized before it's used on the backend. We should probably just send the position in the list.
 - [ ] Change the title when the view changes.
 - [ ] I do not know what happens if some of the source strings provided are empty - I should check for empty data in the API endpoints.
+- [ ] Add some sort of spinner when doing the API requests.
