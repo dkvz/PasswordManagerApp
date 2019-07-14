@@ -24,7 +24,7 @@ export function postLogin(sessionId, password, dataFile) {
             reject('Invalid arguments');
             break;
           case 401:
-            reject('Your session has expired');
+            reject('Session validation failed. Sequence code is wrong or your session has expired.');
             break;
           case 403:
             reject('Invalid password or data file');

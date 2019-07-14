@@ -4,6 +4,10 @@ for details on configuring this project to bundle and minify static web assets. 
 :root {
   --dark-color: #333;
   --light-color: #edebeb;
+  --succes-color: darkgreen;
+  --error-color: darkred;
+  --warn-color: darkorange;
+  --border-color: silver;
 }
 
 html {
@@ -153,7 +157,38 @@ input[type="text"]:focus, input[type="password"]:focus {
 }
 
 .text-danger {
-  color: darkred;
+  color: var(--error-color);
+}
+
+.notification {
+  border: 2px solid var(--border-color);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.notification.success {
+  background-color: var(--succes-color);
+  color: var(--light-color);
+}
+
+.notification.error {
+  background-color: var(--error-color);
+  color: var(--light-color);
+}
+
+.notification.warn {
+  background-color: var(--warn-color);
+  color: var(--dark-color);
+}
+
+.notification > span.close {
+  cursor: pointer;
+  font-size: 1.2rem;
 }
 
 @media (min-width: 768px) {

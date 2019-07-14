@@ -2,6 +2,7 @@ import './css/site.css';
 import aes from './aes';
 import { postLogin } from './api';
 import { base64ToUint8Array } from './b64Uint8ArrayConversions';
+import Toaster from './toaster';
 
 //console.log(aes.randomBytes(16));
 
@@ -12,6 +13,10 @@ if (loginForm) {
   const state = {
     sequence: []
   };
+
+  // Setup the toaster:
+  const notification = document.getElementById('notification');
+  state.toaster = new Toaster(notification);
 
   const seqBtns = document.querySelectorAll('.sequence-grid button');
   const slides = document.querySelectorAll('.slides-container > section');
@@ -66,14 +71,14 @@ if (loginForm) {
                   encryptedPwd,
                   dataFile.selectedIndex
                 )
-                .then(() => console.log('Login success!'))
+                .then(() => state.toaster.success('Login success!'))
                 .catch((err) => {
-                  console.log(`Login error: ${err}`);
+                  state.toaster.error(`Login error: ${err}`);
                   reset();
                 });
               })
               .catch(err => {
-                console.log(`Encryption error: ${err}`);
+                state.toaster.error(`Encryption error: ${err}`);
                 reset();
               });
           });
