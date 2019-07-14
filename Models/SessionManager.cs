@@ -124,6 +124,7 @@ namespace PasswordManagerApp.Models
             }
             catch (Exception ex)
             {
+              Console.Error.WriteLine($"Password Data File processing error: {ex.ToString()}");
               Console.Error.WriteLine(ex.StackTrace);
               sess.Data = null;
               return OpenSessionResult.InvalidPasswordOrFSError;
