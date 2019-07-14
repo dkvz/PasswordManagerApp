@@ -1,6 +1,7 @@
 import './css/site.css';
 import aes from './aes';
 import { postLogin } from './api';
+import { base64ToUint8Array } from './b64Uint8ArrayConversions';
 
 //console.log(aes.randomBytes(16));
 
@@ -41,13 +42,19 @@ if (loginForm) {
     const seqStr = state.sequence.join(';');
     console.log('Current sequence: ' + seqStr);
     console.log('Session ID: ' + state.sessionId);
+    // Convert sessionId to bytes:
+    state.sessionIdBytes = base64ToUint8Array(state.sessionId);
     // We need to SHA1 the sequence, and then SHA1(SHA1(seq) + sessionId)
     // And we need to keep (SHA1(seq) + sessionId) because it's needed to
     // decrypt what the server sends.
-    aes.hash(seqStr)
-      .then(seqHash => {
-        state.key = seqHash + state.sessionId;
-        aes.hash(state.key)
+    aes.hashStringToBytes(seqStr)
+      .then(seqHashBytes => {
+        //state.key = seqHash + state.sessionId;
+        // Concat the byte arrays into one:
+        state.key = new Uint8Array(seqHashBytes.length + state.sessionIdBytes.length);
+        state.key.set(seqHashBytes);
+        state.key.set(state.sessionIdBytes, seqHashBytes.length);
+        aes.hashBytesToString(state.key)
           .then(sessionHash => {
             console.log('Session hash is: ' + sessionHash);
             // Request actual login from API:

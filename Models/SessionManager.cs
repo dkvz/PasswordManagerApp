@@ -98,9 +98,6 @@ namespace PasswordManagerApp.Models
     }
     public OpenSessionResult OpenSession(LoginRequestBody login, IPAddress clientIp)
     {
-      Sessions.ToList().ForEach(s => {
-        Console.WriteLine($"Key for session is: {s.Key}");
-      });
       // Check if we got that session.
       // Trying to get something that doesn't exist from
       // a dictionnary throws exceptions. We should actually

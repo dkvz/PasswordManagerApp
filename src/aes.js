@@ -23,7 +23,8 @@ export default {
       // somewhere though it can all be found here, basically.
       const iv = this.randomBytes(this.ivBytes);
       const salt = new Buffer(this.randomBytes(this.saltBytes));
-      pbkdf2.pbkdf2(password, salt, 10000, 32, 'sha1', (err, dKey) => {
+      const pwd = new Buffer(password);
+      pbkdf2.pbkdf2(pwd, salt, 10000, 32, 'sha1', (err, dKey) => {
         if (err) reject(err);
         else {
           const aesCbc = new aesjs.ModeOfOperation.cbc(dKey, iv);
@@ -48,8 +49,8 @@ export default {
   /**
    * Stole this from here: https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
    */
-  hexString: function(buffer) {
-    const byteArray = new Uint8Array(buffer);
+  hexString: function(byteArray) {
+    //const byteArray = new Uint8Array(buffer);
 
     const hexCodes = [...byteArray].map(value => {
       const hexCode = value.toString(16);
@@ -62,12 +63,34 @@ export default {
   hash: function(source) {
     // Source has to be converted ty a byte array.
     // We can use aesjs.utils.utf8.toBytes.
-    return this.crypto.subtle.digest(
+
+    /* return this.crypto.subtle.digest(
       'SHA-1',
       aesjs.utils.utf8.toBytes(source)
     )
     .then(value => this.hexString(value))
-    .catch(() => this.hexString(this.randomBytes(20)));
+    .catch(() => this.hexString(this.randomBytes(20))); */
+    return this.hashBytesToBytes(aesjs.utils.utf8.toBytes(source))
+      .then(value => this.hexString(value))
+      .catch(value => this.hexString(value));
+  },
+  hashBytesToBytes: function(bytes) {
+    return this.crypto.subtle.digest(
+      'SHA-1',
+      bytes
+    )
+    .then(value => new Uint8Array(value))
+    .catch(() => this.randomBytes(20));
+  },
+  hashBytesToString: function(bytes) {
+    return this.hashBytesToBytes(bytes)
+      .then(value => this.hexString(value))
+      .catch(value => this.hexString(value));
+  },
+  hashStringToBytes: function(source) {
+    return this.hashBytesToBytes(aesjs.utils.utf8.toBytes(source))
+      .then(value => value)
+      .catch(value => value);
   }
     
 };
