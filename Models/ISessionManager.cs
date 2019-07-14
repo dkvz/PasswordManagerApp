@@ -10,6 +10,7 @@ namespace PasswordManagerApp.Models
     int GridHeight { get; }
     int GridWidth { get; }
     SecureSession CreateSession(IPAddress clientIp);
+    SecureSession GetSession(string sessionId, IPAddress clientIp);
     OpenSessionResult OpenSession(LoginRequestBody login, IPAddress clientIp);
     void CleanUpSessions();
     List<string> GetAvailableDataFiles();

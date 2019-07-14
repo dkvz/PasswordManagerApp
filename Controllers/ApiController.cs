@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using PasswordManagerApp.Models;
-using PasswordManager.Models;
 using PasswordManagerApp.Models.Requests;
 
 namespace PasswordManagerApp.Controllers
@@ -31,8 +31,27 @@ namespace PasswordManagerApp.Controllers
     [HttpGet]
     public JsonResult Test()
     {
-      Console.WriteLine("In the API endpoint...");
       return Json("hello");
+    }
+
+    [HttpPost]
+    public JsonResult Names([FromBody]LoginRequestBody sess)
+    {
+      if (sess != null && sess.SessionId != null && sess.SessionId.Length > 0)
+      {
+        var session = _sessionManager.GetSession(
+          sess.SessionId, 
+          Request.HttpContext.Connection.RemoteIpAddress
+        );
+        if (session != null)
+        {
+          return Json(session.Data.PasswordEntries.Select(e => e.Name));
+        }
+      }
+
+      var res = new JsonResult(new { result = "Non authorized" });
+      res.StatusCode = 403;
+      return res;
     }
 
     [HttpPost]

@@ -83,6 +83,14 @@ body > main, .flex-form, .sequence-grid, .slides-container > section {
   max-width: 250px;
 }
 
+.mb-1 {
+  margin-bottom: 1rem;
+}
+
+.mb-2 {
+  margin-bottom: 2rem;
+}
+
 .btn {
   background-color: var(--dark-color);
   padding: 0.5rem 1.2rem;
@@ -189,6 +197,42 @@ input[type="text"]:focus, input[type="password"]:focus {
 .notification > span.close {
   cursor: pointer;
   font-size: 1.2rem;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.toolbar img, .password-input img {
+  height: 32px;
+  width: 32px;
+}
+
+.toolbar button, .password-input button {
+  border: 2px solid var(--dark-color);
+  border-radius: 5px;
+  background-color: var(--light-color);
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  transition: all 0.2s;
+}
+
+.toolbar button:hover, .password-input button:hover {
+  background-color: silver;
+}
+
+.password-input {
+  margin-top: 0.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.password-input input {
+  flex: 1;
 }
 
 @media (min-width: 768px) {

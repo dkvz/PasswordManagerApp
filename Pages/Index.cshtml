@@ -43,7 +43,41 @@
     </form>
   </section>
   <section class="future">
-    <h1>Slide 2</h1>
+
+    <div class="flex-form-row">
+      <h1>Don't leave this tab open!</h1>
+      <button class="btn" type="button" id="logoutBtn">Logout</button>
+    </div>
+    <input type="text" name="filterInput" id="filterInput" placeholder="Filter..." />
+    <form id="selectEntryForm" class="flex-form mb-1">
+      <select id="nameSelect" size="10">
+        <option>Does this work?</option>
+      </select>
+      <button class="btn" type="submit" id="getPwdBtn">Get password</button>
+    </form>
+
+    <div class="toolbar">
+      <button aria-label="New" title="New password" id="newBtn">
+        <img src="/images/file.svg" />
+      </button>
+      <button aria-label="Save changes" title="Save changes" id="saveBtn">
+        <img src="/images/save.svg" />
+      </button>
+      <button aria-label="Show/hide password" title="Show/hide password" id="showHideBtn">
+        <img src="/images/eye.svg" />
+      </button>
+      <button aria-label="Delete this entry" title="Delete entry" id="deleteBtn">
+        <img src="/images/trash-alt.svg" />
+      </button>
+    </div>
+
+    <div class="password-input">
+      <input type="password" id="passwordInput" />
+      <button type="button" id="clipboardBtn" aria-label="Copy to clipboad" title="Copy to clipboard">
+        <img src="/images/clipboard.svg" />
+      </button>
+    </div>
+
   </section>
 </div>
 

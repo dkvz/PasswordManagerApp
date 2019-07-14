@@ -383,8 +383,10 @@ npm test
 - [ ] A cookie called .AspNet.Consent is sent with requests. We might want to get rid of it.
 - [ ] TestRequest.cs should be removed.
 - [x] Re-test the whole session clean up thing.
-- [ ] Some of my calls to System.GC are probably completely wrong, they should be on an outer scope where the references I'm trying to clean up are not even accessible.
 - [x] The file selected at login has to be sanitized before it's used on the backend. We should probably just send the position in the list.
 - [ ] Change the title when the view changes.
 - [ ] I do not know what happens if some of the source strings provided are empty - I should check for empty data in the API endpoints.
 - [ ] Add some sort of spinner when doing the API requests.
+- [ ] There should also be some sort of spinner while we're initializing the index page and processing the JS in site.js.
+- [ ] I don't think the calls to System.GC.Collect() do anything super helpful in the PasswordManagerTools project. I feel like they're slowing everything down by a lot. I should remove them.
+- [ ] The password list (HTML select element) looks terrible. Can we do something with the CSS?

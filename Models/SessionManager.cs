@@ -136,22 +136,27 @@ namespace PasswordManagerApp.Models
               if (dKey != null) HashUtils.ClearByteArray(dKey);
             }
           }
-          else
-          {
-            return OpenSessionResult.DataFileError;
-          }
+          else return OpenSessionResult.DataFileError;
         }
-        else
-        {
-          return OpenSessionResult.IpAddressNotAllowed;
-        }
+        else return OpenSessionResult.IpAddressNotAllowed;
       }
-      else
-      {
-        return OpenSessionResult.InvalidSessionId;
-      }
-      // We should System.GC after calling this.
+      else return OpenSessionResult.InvalidSessionId;
     }
+
+    public SecureSession GetSession(string sessionId, IPAddress clientIp)
+    {
+      // Check if the session exists.
+      // Check if the IP address in the session matches.
+      // If something doesn't verify, return null.
+      if (Sessions.ContainsKey(sessionId))
+      {
+        var sess = Sessions[sessionId];
+        if (sess.ClientIp.Equals(clientIp))
+          return sess;
+      }
+      return null;
+    }
+
     private string getFullDataPath(string filename)
     {
       return _dataPath + filename;

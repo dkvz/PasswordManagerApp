@@ -4,7 +4,12 @@ import { postLogin } from './api';
 import { base64ToUint8Array } from './b64Uint8ArrayConversions';
 import Toaster from './toaster';
 
-//console.log(aes.randomBytes(16));
+function showSuccessSlide(slides) {
+  // We're expecting there to be just two of them even 
+  // though the system is primed for more if needed.
+  slides[0].className = 'past';
+  slides[1].className = 'present';
+}
 
 const loginForm = document.getElementById('loginForm');
 
@@ -24,6 +29,11 @@ if (loginForm) {
   const dataFile = document.getElementById('dataFile');
   const sessionIdInput = document.getElementById('sessionId');
   state.sessionId = sessionIdInput ? sessionIdInput.value : '';
+
+
+  // Cheap debug tactic
+  //showSuccessSlide(slides);
+
 
   const seqInputEvent = (e) => {
     // Button is in e.currentTarget
@@ -45,8 +55,6 @@ if (loginForm) {
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const seqStr = state.sequence.join(';');
-    console.log('Current sequence: ' + seqStr);
-    console.log('Session ID: ' + state.sessionId);
     // Convert sessionId to bytes:
     state.sessionIdBytes = base64ToUint8Array(state.sessionId);
     // We need to SHA1 the sequence, and then SHA1(SHA1(seq) + sessionId)
@@ -61,17 +69,15 @@ if (loginForm) {
         state.key.set(state.sessionIdBytes, seqHashBytes.length);
         aes.hashBytesToString(state.key)
           .then(sessionHash => {
-            console.log('Session hash is: ' + sessionHash);
             // Request actual login from API:
             aes.encrypt(masterPwd.value, state.key)
               .then(encryptedPwd => {
-                console.log('Encrypted password: ' + encryptedPwd);
                 postLogin(
                   sessionHash,
                   encryptedPwd,
                   dataFile.selectedIndex
                 )
-                .then(() => state.toaster.success('Login success!'))
+                .then(showSuccessSlide(slides))
                 .catch((err) => {
                   state.toaster.error(`Login error: ${err}`);
                   reset();
