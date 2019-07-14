@@ -38,7 +38,6 @@ if (loginForm) {
 
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    reset();
     const seqStr = state.sequence.join(';');
     console.log('Current sequence: ' + seqStr);
     console.log('Session ID: ' + state.sessionId);
@@ -52,13 +51,24 @@ if (loginForm) {
           .then(sessionHash => {
             console.log('Session hash is: ' + sessionHash);
             // Request actual login from API:
-            postLogin(
-              sessionHash,
-              aes.encrypt(masterPwd.value, state.key),
-              dataFile.selectedIndex
-            )
-            .then(() => console.log('Login success!'))
-            .catch((err) => console.log(`Login error: ${err}`));
+            aes.encrypt(masterPwd.value, state.key)
+              .then(encryptedPwd => {
+                console.log('Encrypted password: ' + encryptedPwd);
+                postLogin(
+                  sessionHash,
+                  encryptedPwd,
+                  dataFile.selectedIndex
+                )
+                .then(() => console.log('Login success!'))
+                .catch((err) => {
+                  console.log(`Login error: ${err}`);
+                  reset();
+                });
+              })
+              .catch(err => {
+                console.log(`Encryption error: ${err}`);
+                reset();
+              });
           });
       });
   });

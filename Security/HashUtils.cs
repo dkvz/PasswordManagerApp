@@ -20,6 +20,15 @@ namespace PasswordManagerApp.Security
       }
     }
 
+    public static byte[] HashBytes(byte[] bytes)
+    {
+      using (SHA1 shaHash = SHA1.Create())
+      {
+        // ComputeHash - returns byte array  
+        return shaHash.ComputeHash(bytes);
+      }
+    }
+
     public static string ByteArrayToHexString(byte[] bytes)
     {
       // Convert byte array to a string   

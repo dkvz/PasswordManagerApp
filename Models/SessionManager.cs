@@ -74,7 +74,7 @@ namespace PasswordManagerApp.Models
       // We need to hash(hashed_sequence + session_id)
       // Both of these are byte arrays, so we need to build a bigger byte array.
       // Then clear that byte array once we no longer need it.
-      byte[] hashedId = HashUtils.ConcatByteArrays(_sequence, sess.SessionId);
+      byte[] hashedId = HashUtils.HashBytes(HashUtils.ConcatByteArrays(_sequence, sess.SessionId));
       Sessions.TryAdd(HashUtils.ByteArrayToHexString(hashedId), sess);
       HashUtils.ClearByteArray(hashedId);
       return sess;
@@ -98,6 +98,9 @@ namespace PasswordManagerApp.Models
     }
     public OpenSessionResult OpenSession(LoginRequestBody login, IPAddress clientIp)
     {
+      Sessions.ToList().ForEach(s => {
+        Console.WriteLine($"Key for session is: {s.Key}");
+      });
       // Check if we got that session.
       // Trying to get something that doesn't exist from
       // a dictionnary throws exceptions. We should actually

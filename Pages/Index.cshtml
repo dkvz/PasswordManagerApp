@@ -28,7 +28,7 @@
           <div class="sequence-grid-row">
             @for(int x = 0; x < Model.GridWidth; x++)
             {
-              <button type="button" data-y="@y" data-x="@x">&nbsp;</button>
+              <button type="button" data-y="@(y+1)" data-x="@(x+1)">&nbsp;</button>
             }
           </div>
         }
