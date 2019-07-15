@@ -3,13 +3,7 @@ import aes from './aes';
 import { postLogin, postLogout } from './api';
 import { base64ToUint8Array } from './b64Uint8ArrayConversions';
 import Toaster from './toaster';
-
-function showSuccessSlide(slides) {
-  // We're expecting there to be just two of them even 
-  // though the system is primed for more if needed.
-  slides[0].className = 'past';
-  slides[1].className = 'present';
-}
+import { showSuccessSlide, setLoading } from './ui';
 
 const loginForm = document.getElementById('loginForm');
 
@@ -18,6 +12,10 @@ if (loginForm) {
   const state = {
     sequence: []
   };
+
+  // Put up loading screen while initializing:
+  const loading = document.getElementById('loading');
+  setLoading(loading, true);
 
   // Setup the toaster:
   const notification = document.getElementById('notification');
@@ -46,6 +44,7 @@ if (loginForm) {
   const reset = () => {
     state.sequence = [];
     masterPwd.value = '';
+    setLoading(loading, false);
   };
 
   for (let i = 0; i < seqBtns.length; i++) {
@@ -55,6 +54,7 @@ if (loginForm) {
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
     state.toaster.close();
+    setLoading(loading, true);
     const seqStr = state.sequence.join(';');
     // Convert sessionId to bytes:
     state.sessionIdBytes = base64ToUint8Array(state.sessionId);
@@ -79,7 +79,10 @@ if (loginForm) {
                   encryptedPwd,
                   dataFile.selectedIndex
                 )
-                .then(() => showSuccessSlide(slides))
+                .then(() => {
+                  showSuccessSlide(slides);
+                  setLoading(loading, false);
+                })
                 .catch((err) => {
                   state.toaster.error(`Login error: ${err}`);
                   reset();
@@ -108,4 +111,6 @@ if (loginForm) {
     }
   });
   
+  setLoading(loading, false);
+
 }
