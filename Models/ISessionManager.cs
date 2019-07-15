@@ -12,6 +12,7 @@ namespace PasswordManagerApp.Models
     SecureSession CreateSession(IPAddress clientIp);
     SecureSession GetSession(string sessionId, IPAddress clientIp);
     OpenSessionResult OpenSession(LoginRequestBody login, IPAddress clientIp);
+    bool CloseSession(string sessionId, IPAddress clientIp);
     void CleanUpSessions();
     List<string> GetAvailableDataFiles();
   }

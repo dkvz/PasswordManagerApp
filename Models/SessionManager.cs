@@ -143,6 +143,21 @@ namespace PasswordManagerApp.Models
       else return OpenSessionResult.InvalidSessionId;
     }
 
+    public bool CloseSession(string sessionId, IPAddress clientIp)
+    {
+      if (Sessions.ContainsKey(sessionId))
+      {
+        var sess = Sessions[sessionId];
+        if (sess.ClientIp.Equals(clientIp))
+        {
+          Sessions.Remove(sessionId);
+          sess.Dispose();
+          return true;
+        }
+      }
+      return false;
+    }
+
     public SecureSession GetSession(string sessionId, IPAddress clientIp)
     {
       // Check if the session exists.

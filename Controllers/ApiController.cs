@@ -55,6 +55,20 @@ namespace PasswordManagerApp.Controllers
     }
 
     [HttpPost]
+    public JsonResult Logout([FromBody]LoginRequestBody sess)
+    {
+      if (sess != null && sess.SessionId != null && sess.SessionId.Length > 0)
+      {
+        _sessionManager.CloseSession(
+          sess.SessionId,
+          Request.HttpContext.Connection.RemoteIpAddress
+        );
+      }
+      // I chose to always return success.
+      return Json(new {result = "OK"});
+    }
+
+    [HttpPost]
     public JsonResult Login([FromBody]LoginRequestBody login)
     {
       // - Check that the session exists

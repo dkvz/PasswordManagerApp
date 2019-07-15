@@ -1,18 +1,18 @@
 
+function createApiRequest(body) {
+  return {
+    method: 'post',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  };
+}
+
 export function postLogin(sessionId, password, dataFile) {
   return new Promise((resolve, reject) => {
-    fetch('/api/v1/login', {
-      method: 'post',
-      headers: {
-        //'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        sessionId,
-        password,
-        dataFile
-      })
-    })
+    fetch('/api/v1/login', createApiRequest({ sessionId, password, dataFile }))
     .then((resp) => { 
       // I think I'm going to respond with JSON.
       // Should probably check the response status here.
@@ -35,5 +35,16 @@ export function postLogin(sessionId, password, dataFile) {
       }
     })
     .catch(() => reject('Network error'));
+  });
+}
+
+export function postLogout(sessionId) {
+  return new Promise((resolve) => {
+    fetch('/api/v1/logout', createApiRequest({ sessionId }))
+    .then((resp) => {
+      // We always expect this to work.
+      resolve(resp);
+    })
+    .catch((err) => resolve(err));
   });
 }

@@ -1,6 +1,6 @@
 import './css/site.css';
 import aes from './aes';
-import { postLogin } from './api';
+import { postLogin, postLogout } from './api';
 import { base64ToUint8Array } from './b64Uint8ArrayConversions';
 import Toaster from './toaster';
 
@@ -54,6 +54,7 @@ if (loginForm) {
 
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
+    state.toaster.close();
     const seqStr = state.sequence.join(';');
     // Convert sessionId to bytes:
     state.sessionIdBytes = base64ToUint8Array(state.sessionId);
@@ -69,6 +70,7 @@ if (loginForm) {
         state.key.set(state.sessionIdBytes, seqHashBytes.length);
         aes.hashBytesToString(state.key)
           .then(sessionHash => {
+            state.sessionHash = sessionHash;
             // Request actual login from API:
             aes.encrypt(masterPwd.value, state.key)
               .then(encryptedPwd => {
@@ -77,7 +79,7 @@ if (loginForm) {
                   encryptedPwd,
                   dataFile.selectedIndex
                 )
-                .then(showSuccessSlide(slides))
+                .then(() => showSuccessSlide(slides))
                 .catch((err) => {
                   state.toaster.error(`Login error: ${err}`);
                   reset();
@@ -91,5 +93,19 @@ if (loginForm) {
       });
   });
 
-  document.getElementById('resetBtn').addEventListener('click', reset);
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    state.toaster.close();
+    reset();
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    if (state.sessionHash) {
+      postLogout(state.sessionHash)
+        .then(resp => {
+          console.log(resp);
+          window.location.reload();
+        });
+    }
+  });
+  
 }

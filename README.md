@@ -390,3 +390,4 @@ npm test
 - [ ] There should also be some sort of spinner while we're initializing the index page and processing the JS in site.js.
 - [ ] I don't think the calls to System.GC.Collect() do anything super helpful in the PasswordManagerTools project. I feel like they're slowing everything down by a lot. I should remove them.
 - [ ] The password list (HTML select element) looks terrible. Can we do something with the CSS?
+- [ ] Add a margin left to the close icon for the toaster message, make it bigger too.
