@@ -391,3 +391,4 @@ npm test
 - [ ] I don't think the calls to System.GC.Collect() do anything super helpful in the PasswordManagerTools project. I feel like they're slowing everything down by a lot. I should remove them.
 - [ ] The password list (HTML select element) looks terrible. Can we do something with the CSS?
 - [ ] Add a margin left to the close icon for the toaster message, make it bigger too.
+- [ ] Add some sort of check that shows a warning if the connection is not in HTTPS.

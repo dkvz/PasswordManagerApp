@@ -48,3 +48,23 @@ export function postLogout(sessionId) {
     .catch((err) => resolve(err));
   });
 }
+
+export function getNames(sessionId) {
+  return new Promise((resolve, reject) => {
+    fetch('/api/v1/names', createApiRequest({ sessionId }))
+    .then((resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        resp.json().then(resolve);
+      } else {
+        switch(resp.status) {
+          case 403:
+            reject('Unauthorized access');
+            break;
+          default:
+            reject(`Server error, status ${resp.status}`);
+        }
+      }
+    })
+    .catch(reject);
+  });
+}

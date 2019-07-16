@@ -14,7 +14,7 @@
 
 <div class="slides-container">
   <section class="present">
-    <form id="loginForm" class="flex-form">
+    <form id="loginForm" class="flex-form" method="post">
       <div class="flex-form-row">
         <label for="dataFile">Data file:</label>
         <select id="dataFile">
@@ -26,7 +26,7 @@
       </div>
 
       <div class="flex-form-row">
-        <input type="password" placeholder="Master Password" id="masterPassword" name="masterPassword" />
+        <input type="password" placeholder="Master Password" id="masterPassword" />
         <input type="hidden" value="@Model.Session" id="sessionId" />
       </div>
 
@@ -54,8 +54,8 @@
       <h1>Don't leave this tab open!</h1>
       <button class="btn" type="button" id="logoutBtn">Logout</button>
     </div>
-    <input type="text" name="filterInput" id="filterInput" placeholder="Filter..." />
-    <form id="selectEntryForm" class="flex-form mb-1">
+    <input type="text" id="filterInput" placeholder="Filter..." />
+    <form id="selectEntryForm" class="flex-form mb-1" method="post">
       <select id="nameSelect" size="10">
         <option>Does this work?</option>
       </select>
@@ -90,7 +90,6 @@
 @section Scripts {
   <script>
   if (!window.Uint8Array || !window.crypto || !window.crypto.subtle || !window.fetch) {
-    console.log(window.location.href);
     window.location.href = '/unsupported';
   }
   </script>

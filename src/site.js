@@ -1,9 +1,14 @@
 import './css/site.css';
 import aes from './aes';
-import { postLogin, postLogout } from './api';
+import { postLogin, postLogout, getNames } from './api';
 import { base64ToUint8Array } from './b64Uint8ArrayConversions';
 import Toaster from './toaster';
-import { showSuccessSlide, setLoading } from './ui';
+import {
+  showSuccessSlide, 
+  setLoading,
+  removeNodesFromElement,
+  addHtmlOption 
+} from './ui';
 
 const loginForm = document.getElementById('loginForm');
 
@@ -25,6 +30,7 @@ if (loginForm) {
   const slides = document.querySelectorAll('.slides-container > section');
   const masterPwd = document.getElementById('masterPassword');
   const dataFile = document.getElementById('dataFile');
+  const nameSelect = document.getElementById('nameSelect');
   const sessionIdInput = document.getElementById('sessionId');
   state.sessionId = sessionIdInput ? sessionIdInput.value : '';
 
@@ -39,6 +45,28 @@ if (loginForm) {
       e.currentTarget.getAttribute('data-x') + ',' + 
       e.currentTarget.getAttribute('data-y')
     );
+  };
+
+  const refreshNames = () => {
+    return new Promise((resolve) => {
+      getNames(state.sessionHash)
+        .then(data => {
+          removeNodesFromElement(nameSelect);
+          state.names = data.map((n, i) => ({name: n, index: i}))
+            .sort(
+              (a, b) => 
+                a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
+            );
+          state.names.forEach(
+            (e) => addHtmlOption(nameSelect, e.name, document, e.index)
+          );
+          resolve(true);
+        })
+        .catch(err => {
+          state.toaster.error(`Error loading the entries: ${err}`);
+          resolve(false);
+        });
+    });
   };
 
   const reset = () => {
@@ -80,8 +108,11 @@ if (loginForm) {
                   dataFile.selectedIndex
                 )
                 .then(() => {
-                  showSuccessSlide(slides);
-                  setLoading(loading, false);
+                  // Get the entry names:
+                  refreshNames().then(() => {
+                    setLoading(loading, false);
+                    showSuccessSlide(slides);
+                  });
                 })
                 .catch((err) => {
                   state.toaster.error(`Login error: ${err}`);
