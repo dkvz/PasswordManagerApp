@@ -91,8 +91,14 @@ body > main, .flex-form, .sequence-grid, .slides-container > section {
 .flex-form-row, .sequence-grid {
   margin-bottom: 1rem;
 }
+ 
+.flex-form-row > button, 
+.flex-form-row > input, 
+.sequence-grid-row > button {
+  flex: 1;
+}
 
-.flex-form-row > label, .flex-form-row > button, .flex-form-row > input, .sequence-grid-row > button {
+.stretched-label {
   flex: 1;
 }
 
@@ -106,6 +112,22 @@ body > main, .flex-form, .sequence-grid, .slides-container > section {
 
 .mb-2 {
   margin-bottom: 2rem;
+}
+
+.mt-1 {
+  margin-top: 1rem;
+}
+
+.mt-2 {
+  margin-top: 2rem;
+}
+
+.mr-1 {
+  margin-right: 1rem;
+}
+
+.mr-2 {
+  margin-right: 2rem;
 }
 
 .btn {
@@ -126,6 +148,7 @@ input[type="text"], input[type="password"] {
   padding: 12px;
   border: 2px solid var(--dark-color);
   border-radius: 5px;
+  font-size: 1.1rem;
 }
 
 input[type="text"]:focus, input[type="password"]:focus {
@@ -242,7 +265,6 @@ input[type="text"]:focus, input[type="password"]:focus {
 }
 
 .password-input {
-  margin-top: 0.2rem;
   display: flex;
   justify-content: center;
   align-items: stretch;
@@ -284,6 +306,10 @@ input[type="text"]:focus, input[type="password"]:focus {
   font-weight: bolder;
   color: var(--accent-color);
   animation: scaler 0.6s infinite; 
+}
+
+select[size] {
+  font-size: 1.1rem;
 }
 
 @keyframes scaler {

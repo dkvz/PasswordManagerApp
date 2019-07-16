@@ -111,6 +111,7 @@ if (loginForm) {
                   // Get the entry names:
                   refreshNames().then(() => {
                     setLoading(loading, false);
+                    document.title = document.title.replace('Login', 'CONNECTED');
                     showSuccessSlide(slides);
                   });
                 })

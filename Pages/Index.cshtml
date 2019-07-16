@@ -16,7 +16,7 @@
   <section class="present">
     <form id="loginForm" class="flex-form" method="post">
       <div class="flex-form-row">
-        <label for="dataFile">Data file:</label>
+        <label class="stretched-label" for="dataFile">Data file:</label>
         <select id="dataFile">
           @foreach (var file in Model.DataFiles)
           {
@@ -75,6 +75,11 @@
       <button aria-label="Delete this entry" title="Delete entry" id="deleteBtn">
         <img src="/images/trash-alt.svg" />
       </button>
+    </div>
+
+    <div class="flex-form-row mt-1">
+      <label for="nameInput" class="mr-1">Entry name:</label>
+      <input type="text" id="nameInput" />
     </div>
 
     <div class="password-input">
