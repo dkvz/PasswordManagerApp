@@ -163,7 +163,7 @@ There is an example GraphQL API from the author [here](https://github.com/Biblio
 Since that guy uses some sort of dependency injection thingy I turned to [another article](https://fullstackmark.com/post/17/building-a-graphql-api-with-aspnet-core-2-and-entity-framework-core).
 That article also explains how to install GraphiQL. But I won't be usin git.
 
-## The schema
+### The schema
 I got a list of names and associated passwords.
 
 We should create the types associated with that schema, which is pretty simple.
@@ -176,6 +176,13 @@ We should then create the Query and Mutation objects resolvers thingies accessor
 * Models/PasswordManagerMutation
 
 And finally: Models/PasswordManagerSchema.
+
+## The API
+I should probably document it at some point. I might not.
+
+All the endpoints are in `ApiController.cs`. Client-side code is in `api.js`.
+
+They all use the POST method.
 
 ## Assets bundling
 I think the easiest plan is to npm init the project directory and reference bundled files in `_Layout.cshtml` in the link and script tags (output to wwwroot and the right subdirectories).
@@ -384,12 +391,13 @@ npm test
 - [ ] TestRequest.cs should be removed.
 - [x] Re-test the whole session clean up thing.
 - [x] The file selected at login has to be sanitized before it's used on the backend. We should probably just send the position in the list.
-- [ ] Change the title when the view changes.
+- [x] Change the title when the view changes.
 - [ ] I do not know what happens if some of the source strings provided are empty - I should check for empty data in the API endpoints.
 - [x] Add some sort of spinner when doing the API requests.
 - [ ] There should also be some sort of spinner while we're initializing the index page and processing the JS in site.js.
 - [ ] I don't think the calls to System.GC.Collect() do anything super helpful in the PasswordManagerTools project. I feel like they're slowing everything down by a lot. I should remove them.
-- [ ] The password list (HTML select element) looks terrible. Can we do something with the CSS?
+- [x] The password list (HTML select element) looks terrible. Can we do something with the CSS? -> Not really if using the select element as is.
 - [ ] Add a margin left to the close icon for the toaster message, make it bigger too.
 - [ ] Add some sort of check that shows a warning if the connection is not in HTTPS.
 - [ ] Lock an IP address that does too many failed login attempts.
+- [ ] App. directory structure is messed up. I should have a sln project referencing all the others (including the Test project) and have better naming for the directories with C# or JS code.

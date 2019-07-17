@@ -52,7 +52,7 @@ if (loginForm) {
       getNames(state.sessionHash)
         .then(data => {
           removeNodesFromElement(nameSelect);
-          state.names = data.map((n, i) => ({name: n, index: i}))
+          state.names = data.map((n, i) => ({name: n, index: i + 1}))
             .sort(
               (a, b) => 
                 a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1

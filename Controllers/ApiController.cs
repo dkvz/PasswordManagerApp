@@ -59,9 +59,7 @@ namespace PasswordManagerApp.Controllers
         return Json(session.Data.PasswordEntries.Select(e => e.Name));
       }
 
-      var res = new JsonResult(new { result = "Non authorized" });
-      res.StatusCode = 403;
-      return res;
+      return ApiController.nonAuthorized();
     }
 
     [HttpPost]
@@ -75,7 +73,110 @@ namespace PasswordManagerApp.Controllers
         );
       }
       // I chose to always return success.
-      return Json(new {result = "OK"});
+      // return Json(new {result = "OK"});
+      return ApiController.success();
+    }
+
+    private static JsonResult success()
+    {
+      return new JsonResult(new {result = "OK"});
+    }
+
+    private static JsonResult serverError()
+    {
+      var sErr = new JsonResult(new { result = "Server error" });
+      sErr.StatusCode = 500;
+      return sErr;
+    }
+
+    private static JsonResult nonAuthorized()
+    {
+      var res = new JsonResult(new { result = "Non authorized" });
+      res.StatusCode = 403;
+      return res;
+    }
+
+    [HttpPost]
+    public JsonResult Entry([FromBody]EntryRequestBody req)
+    {
+      /*
+      Single endpoint to do CRUD on password entries.
+
+      The list IDs (EntryId) sent from the client start at 1 and not 0!
+      Value 0 for EntryId means something is wrong (default int value).
+
+      By design we just send 403 errors if the entry requested does
+      not exist.
+       */
+      var session = getSession(
+        req, 
+        Request.HttpContext.Connection.RemoteIpAddress
+      );
+      if (session != null && session.Data != null && session.Data.IsEncryptedList)
+      {
+        if (req.Operation == RequestOperation.Create)
+        {
+          // We need a non empty name and password.
+          // By the nature of EntryRequestBody we know these two can't 
+          // be null.
+          if (req.Name.Length > 0 && req.Password.Length > 0)
+          {
+            try 
+            {
+              // We need to call SaveToFile on the data thing at some
+              // point.
+              session.Data.AddEntry(req.Name, req.Password);
+              // Someone could actually change the master password being used
+              // with this endpoint. Should it be allowed?
+              
+            }
+            catch
+            {
+              return ApiController.serverError();
+            }
+          }
+        }
+        else 
+        {
+          // All the other operations require a valid entryId.
+          // Default operation is Read.
+          // Reminder: EntryId received from the client start at 
+          // index 1 and not 0.
+          if (req.EntryId > 0 && req.EntryId <= _sessionManager.Count)
+          {
+            try 
+            {
+              switch(req.Operation)
+              {
+                case RequestOperation.Modify:
+                  // Needs to call SaveToFile on the Data at some point.
+
+                  break;
+                case RequestOperation.Delete:
+                  // Needs to call SaveToFile on the Data at some point.
+
+                  break;
+                default:
+                  // We can just give the GenericPasswordEntry object
+                  // to Json() and it should work fine.
+                  return Json(session.Data.PasswordEntries[req.EntryId]);
+              }
+            }
+            catch
+            {
+              return ApiController.serverError();
+            }
+          }
+        }
+        return Json(req);
+      }
+      return ApiController.nonAuthorized();
+    }
+
+    [HttpPost]
+    public JsonResult Test([FromBody]EntryRequestBody req)
+    {
+      return Json(req);
     }
 
     [HttpPost]
