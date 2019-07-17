@@ -401,3 +401,5 @@ npm test
 - [ ] Add some sort of check that shows a warning if the connection is not in HTTPS.
 - [ ] Lock an IP address that does too many failed login attempts.
 - [ ] App. directory structure is messed up. I should have a sln project referencing all the others (including the Test project) and have better naming for the directories with C# or JS code.
+- [ ] Show an unsaved changes warning message (using the warning colours) in the notification section when saves need to happen, also show the save button (hide otherwise).
+- [ ] I have serious issues with using text inputs in flex rows, when you resize to minimum width some of the inputs are sticking out of the viewport. We might need a width: 100% on body or something.

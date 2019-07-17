@@ -32,7 +32,7 @@ namespace PasswordManagerApp.Controllers
     [HttpGet]
     public JsonResult Test()
     {
-      return Json("hello");
+      return Json("Strange API Version 0.1");
     }
 
     private SecureSession getSession(RequestBody sess, IPAddress clientIp)
@@ -123,12 +123,9 @@ namespace PasswordManagerApp.Controllers
           {
             try 
             {
-              // We need to call SaveToFile on the data thing at some
-              // point.
+              // This endpoint doesn't actually save the changes to disk.
               session.Data.AddEntry(req.Name, req.Password);
-              // Someone could actually change the master password being used
-              // with this endpoint. Should it be allowed?
-              
+              ApiController.success();
             }
             catch
             {
@@ -149,13 +146,19 @@ namespace PasswordManagerApp.Controllers
               switch(req.Operation)
               {
                 case RequestOperation.Modify:
-                  // Needs to call SaveToFile on the Data at some point.
-
+                  // We need the name and passwords to not be empty:
+                  if (req.Name.Length > 0 && req.Password.Length > 0)
+                  {
+                    var entry = session.Data.GetEntry(req.EntryId);
+                    entry.Name = req.Name;
+                    entry.Password = req.Password;
+                    entry.Date = DateTime.Now;
+                    return ApiController.success();
+                  }
                   break;
                 case RequestOperation.Delete:
-                  // Needs to call SaveToFile on the Data at some point.
-
-                  break;
+                  session.Data.RemoveEntry(req.EntryId);
+                  return ApiController.success();
                 default:
                   // We can just give the GenericPasswordEntry object
                   // to Json() and it should work fine.
@@ -173,10 +176,20 @@ namespace PasswordManagerApp.Controllers
       return ApiController.nonAuthorized();
     }
 
-    [HttpPost]
+    /* [HttpPost]
     public JsonResult Test([FromBody]EntryRequestBody req)
     {
       return Json(req);
+    } */
+
+    [HttpPost]
+    public JsonResult Save([FromBody]LoginRequestBody login)
+    {
+      // Attempt to save the password data file opened for
+      // the session to disk.
+      // This is very similar to loging in as we got the 
+      // master password in the request.
+      return ApiController.success();
     }
 
     [HttpPost]
