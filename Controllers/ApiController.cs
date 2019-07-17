@@ -35,7 +35,7 @@ namespace PasswordManagerApp.Controllers
     }
 
     [HttpPost]
-    public JsonResult Names([FromBody]LoginRequestBody sess)
+    public JsonResult Names([FromBody]RequestBody sess)
     {
       if (sess != null && sess.SessionId != null && sess.SessionId.Length > 0)
       {
@@ -55,7 +55,7 @@ namespace PasswordManagerApp.Controllers
     }
 
     [HttpPost]
-    public JsonResult Logout([FromBody]LoginRequestBody sess)
+    public JsonResult Logout([FromBody]RequestBody sess)
     {
       if (sess != null && sess.SessionId != null && sess.SessionId.Length > 0)
       {
