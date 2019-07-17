@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Net;
 using System.Linq;
 using PasswordManagerApp.Models;
 using PasswordManagerApp.Models.Requests;
@@ -34,19 +35,28 @@ namespace PasswordManagerApp.Controllers
       return Json("hello");
     }
 
-    [HttpPost]
-    public JsonResult Names([FromBody]RequestBody sess)
+    private SecureSession getSession(RequestBody sess, IPAddress clientIp)
     {
       if (sess != null && sess.SessionId != null && sess.SessionId.Length > 0)
       {
-        var session = _sessionManager.GetSession(
+        return _sessionManager.GetSession(
           sess.SessionId, 
           Request.HttpContext.Connection.RemoteIpAddress
         );
-        if (session != null)
-        {
-          return Json(session.Data.PasswordEntries.Select(e => e.Name));
-        }
+      }
+      return null;
+    }
+
+    [HttpPost]
+    public JsonResult Names([FromBody]RequestBody sess)
+    {
+      var session = getSession(
+        sess, 
+        Request.HttpContext.Connection.RemoteIpAddress
+      );
+      if (session != null)
+      {
+        return Json(session.Data.PasswordEntries.Select(e => e.Name));
       }
 
       var res = new JsonResult(new { result = "Non authorized" });
