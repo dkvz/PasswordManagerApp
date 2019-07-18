@@ -146,8 +146,11 @@ if (loginForm) {
 
   selectEntryForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    
+    const eventId = nameSelect.options[nameSelect.selectedIndex].value;
+    console.log(`Selected ID is ${eventId}`);
   });
+
+  nameSelect.addEventListener('dblclick', () => selectEntryForm.submit());
   
   setLoading(loading, false);
 
