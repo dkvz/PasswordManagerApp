@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Net;
+using System.Text;
 using System.Linq;
 using PasswordManagerApp.Models;
 using PasswordManagerApp.Models.Requests;
+using System.Security.Cryptography;
 
 namespace PasswordManagerApp.Controllers
 {
@@ -187,9 +189,64 @@ namespace PasswordManagerApp.Controllers
     {
       // Attempt to save the password data file opened for
       // the session to disk.
-      // This is very similar to loging in as we got the 
+      // This is very similar to logging in as we got the 
       // master password in the request.
-      return ApiController.success();
+
+      // Check if the password is the original one, return
+      // a 401 if not.
+
+      // Most of this method should arguably be in 
+      // SessionManager using a SaveSessionResult enum
+      // like the OpenSession one.
+
+      if (login.Password != null && login.Password.Length > 0)
+      {
+        var session = getSession(
+          login,
+          Request.HttpContext.Connection.RemoteIpAddress
+        );
+        if (session != null && session.Data != null)
+        {
+          byte[] mPwd = null;
+          try
+          {
+            mPwd = Encoding.UTF8.GetBytes(login.Password);
+            if (session.Data.IsOriginalPassword(mPwd))
+            {
+              try
+              {
+                _sessionManager.SaveSessionData(session, mPwd);
+                // Don't forget to return some kind of success
+                // response at some point.
+                return ApiController.success();
+              }
+              catch(CryptographicException)
+              {
+                // Session encryption is not working correctly.
+                // return ApiController.nonAuthorized();
+                // This will end up sending nonAuthorized at the end.
+              }
+            }
+            else
+            {
+              JsonResult res = new JsonResult(new { result = "Wrong master password" });
+              res.StatusCode = 401;
+              return res;
+            }
+          }
+          catch
+          {
+            return ApiController.serverError();
+          }
+          finally
+          {
+            // The byte array might already be cleared but it
+            // doesn't hurt to do it more than one time.
+            if (mPwd != null) Array.Clear(mPwd, 0, mPwd.Length);
+          }
+        }
+      }
+      return ApiController.nonAuthorized();
     }
 
     [HttpPost]

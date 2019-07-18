@@ -62,6 +62,22 @@ namespace PasswordManagerApp.Models
         GridWidth = 3;
       }
     }
+    private byte[] generateSessionKey(SecureSession session)
+    {
+      return HashUtils.ConcatByteArrays(_sequence, session.SessionId);
+    }
+    public void SaveSessionData(SecureSession session, byte[] masterPassword)
+    {
+      var textGenerator = new RandomPlaceholderTextGenerator();
+      var fakePwd = textGenerator.RandomString(16); 
+      byte[] key = generateSessionKey(session);
+      session.Data.SaveToFile(
+        masterPassword,
+        ref fakePwd,
+        textGenerator,
+        key
+      );
+    }
     public SecureSession CreateSession(IPAddress clientIp)
     {
       var sess = new SecureSession(clientIp);
