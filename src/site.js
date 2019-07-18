@@ -1,13 +1,18 @@
 import './css/site.css';
 import aes from './aes';
-import { postLogin, postLogout, getNames } from './api';
+import {
+  postLogin,
+  postLogout,
+  getNames,
+  getEntry
+} from './api';
 import { base64ToUint8Array } from './b64Uint8ArrayConversions';
 import Toaster from './toaster';
 import {
-  showSuccessSlide, 
+  showSuccessSlide,
   setLoading,
   removeNodesFromElement,
-  addHtmlOption 
+  addHtmlOption
 } from './ui';
 
 const loginForm = document.getElementById('loginForm');
@@ -32,6 +37,9 @@ if (loginForm) {
   const dataFile = document.getElementById('dataFile');
   const nameSelect = document.getElementById('nameSelect');
   const selectEntryForm = document.getElementById('selectEntryForm');
+  const entryDate = document.getElementById('entryDate');
+  const nameInput = document.getElementById('nameInput');
+  const passwordInput = document.getElementById('passwordInput');
   const sessionIdInput = document.getElementById('sessionId');
   state.sessionId = sessionIdInput ? sessionIdInput.value : '';
 
@@ -43,9 +51,39 @@ if (loginForm) {
   const seqInputEvent = (e) => {
     // Button is in e.currentTarget
     state.sequence.push(
-      e.currentTarget.getAttribute('data-x') + ',' + 
+      e.currentTarget.getAttribute('data-x') + ',' +
       e.currentTarget.getAttribute('data-y')
     );
+  };
+
+  const getSelectedEntry = () => {
+    // Don't forget to set the loading status somewhere.
+    // Actually it's so fast that I won't for now.
+    state.toaster.close();
+    if (nameSelect.selectedIndex !== undefined) {
+      const entryId = nameSelect.options[nameSelect.selectedIndex].value;
+      getEntry(state.sessionHash, entryId)
+        .then(data => {
+          // We need to decrypt the password:
+          if (data && data.password) {
+            aes.decrypt(data.password, state.key)
+              .then(pwd => {
+                nameInput.value = data.name;
+                entryDate.textContent = 
+                  `Last modified: ${data.parsedDate.toLocaleDateString()}`;
+                passwordInput.value = pwd;
+              })
+              .catch(err => {
+                state.toaster.error(`Could not decrypt data from server`);
+                console.log(err);
+              });
+          } else state.toaster.error(`Server sent malformed data`);
+        })
+        .catch(err => {
+          state.toaster.error(`Error loading data for the entry: ${err}`);
+        })
+    }
+
   };
 
   const refreshNames = () => {
@@ -53,13 +91,20 @@ if (loginForm) {
       getNames(state.sessionHash)
         .then(data => {
           removeNodesFromElement(nameSelect);
-          state.names = data.map((n, i) => ({name: n, index: i + 1}))
+          state.names = data.map((n, i) => ({ name: n, index: i + 1 }))
             .sort(
-              (a, b) => 
+              (a, b) =>
                 a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
             );
           state.names.forEach(
-            (e) => addHtmlOption(nameSelect, e.name, document, e.index)
+            (e) =>
+              addHtmlOption(
+                nameSelect,
+                e.name,
+                document,
+                e.index,
+                { type: 'dblclick', callback: getSelectedEntry }
+              )
           );
           resolve(true);
         })
@@ -108,18 +153,18 @@ if (loginForm) {
                   encryptedPwd,
                   dataFile.selectedIndex
                 )
-                .then(() => {
-                  // Get the entry names:
-                  refreshNames().then(() => {
-                    setLoading(loading, false);
-                    document.title = document.title.replace('Login', 'CONNECTED');
-                    showSuccessSlide(slides);
+                  .then(() => {
+                    // Get the entry names:
+                    refreshNames().then(() => {
+                      setLoading(loading, false);
+                      document.title = document.title.replace('Login', 'CONNECTED');
+                      showSuccessSlide(slides);
+                    });
+                  })
+                  .catch((err) => {
+                    state.toaster.error(`Login error: ${err}`);
+                    reset();
                   });
-                })
-                .catch((err) => {
-                  state.toaster.error(`Login error: ${err}`);
-                  reset();
-                });
               })
               .catch(err => {
                 state.toaster.error(`Encryption error: ${err}`);
@@ -146,12 +191,9 @@ if (loginForm) {
 
   selectEntryForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const eventId = nameSelect.options[nameSelect.selectedIndex].value;
-    console.log(`Selected ID is ${eventId}`);
+    getSelectedEntry();
   });
 
-  nameSelect.addEventListener('dblclick', () => selectEntryForm.submit());
-  
   setLoading(loading, false);
 
 }

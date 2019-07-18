@@ -1,6 +1,7 @@
 import aesjs from 'aes-js';
 import pbkdf2 from 'pbkdf2';
 import { Uint8ArrayToBase64, base64ToUint8Array } from './b64Uint8ArrayConversions';
+import { byteArrayToString } from './textConversions';
 const Buffer = require('buffer/').Buffer;
 
 export default {
@@ -8,15 +9,17 @@ export default {
   quota: 65536,
   saltBytes: 16,
   ivBytes: 16,
+  keyBytes: 32,
+  iterations: 10000,
   // Stolen and adapted from here: https://gist.github.com/alexdiliberto/39a4ad0453310d0a69ce
-  randomBytes: function(n) {
+  randomBytes: function (n) {
     const a = new Uint8Array(n);
     for (let i = 0; i < n; i += this.quota) {
       this.crypto.getRandomValues(a.subarray(i, i + Math.min(n - i, this.quota)));
     }
     return a;
   },
-  encrypt: function(payload, password) {
+  encrypt: function (payload, password) {
     return new Promise((resolve, reject) => {
       // We want to output a base64 string in the end.
       // I should probably document the specificities of the encryption 
@@ -24,7 +27,7 @@ export default {
       const iv = this.randomBytes(this.ivBytes);
       const salt = new Buffer(this.randomBytes(this.saltBytes));
       const pwd = new Buffer(password);
-      pbkdf2.pbkdf2(pwd, salt, 10000, 32, 'sha1', (err, dKey) => {
+      pbkdf2.pbkdf2(pwd, salt, this.iterations, this.keyBytes, 'sha1', (err, dKey) => {
         if (err) reject(err);
         else {
           const aesCbc = new aesjs.ModeOfOperation.cbc(dKey, iv);
@@ -40,16 +43,65 @@ export default {
       });
     });
   },
-  decrypt: function(payload, password) {
+  decrypt: function (payload, password) {
     return new Promise((resolve, reject) => {
       // We expect payload to be base64.
-      
+      // We need to:
+      /*
+      - Convert the base64 to byte array
+      - Extract the salt and iv 
+        -> They have to be "Buffer" objects
+        -> They appear in that order
+      - Derive the key
+      - Create the aesjs decryptor
+      - Decrypt to byte array
+      - Convert to string BUT IGNORE THE PADDING BYTES
+      */
+      const payloadBytes = base64ToUint8Array(payload);
+      // We can use subarray:
+      const salt = new Buffer(payloadBytes.subarray(0, this.saltBytes));
+      const iv = payloadBytes.subarray(this.saltBytes, this.ivBytes + this.saltBytes);
+      const pwd = new Buffer(password);
+      pbkdf2.pbkdf2(pwd, salt, this.iterations, this.keyBytes, 'sha1', (err, dKey) => {
+        if (err) reject(err);
+        else {
+          const aesCbc = new aesjs.ModeOfOperation.cbc(dKey, iv);
+          const decryptedBytes = aesCbc.decrypt(
+            payloadBytes.subarray(this.saltBytes + this.ivBytes, payloadBytes.length)
+          );
+          
+          // Convert to string.
+          // We need to find out if there are padding bytes and how many
+          // in order to ignore them.
+          /*
+          The idea is to look at the last byte:
+            - If it's 1 -> 16, it's a padding byte 
+              -> Unicode 0 to 16 are not real characters.
+              -> We could probably go 1 -> 15 and ignore the empty string.
+            - The decimal number value of the byte is the amount of padding bytes
+          */
+
+          const lastB = decryptedBytes[decryptedBytes.length - 1];
+          if (lastB > 0 && lastB <= 16) {
+            resolve(
+              byteArrayToString(
+                decryptedBytes.subarray(
+                  0,
+                  decryptedBytes.length - lastB
+                )
+              )
+            )
+          } else {
+            resolve(byteArrayToString(decryptedBytes));
+          }
+        }
+      });
     });
   },
   /**
    * Stole this from here: https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
    */
-  hexString: function(byteArray) {
+  hexString: function (byteArray) {
     //const byteArray = new Uint8Array(buffer);
 
     const hexCodes = [...byteArray].map(value => {
@@ -57,10 +109,10 @@ export default {
       const paddedHexCode = hexCode.padStart(2, '0');
       return paddedHexCode;
     });
-  
+
     return hexCodes.join('');
   },
-  hash: function(source) {
+  hash: function (source) {
     // Source has to be converted ty a byte array.
     // We can use aesjs.utils.utf8.toBytes.
 
@@ -74,23 +126,23 @@ export default {
       .then(value => this.hexString(value))
       .catch(value => this.hexString(value));
   },
-  hashBytesToBytes: function(bytes) {
+  hashBytesToBytes: function (bytes) {
     return this.crypto.subtle.digest(
       'SHA-1',
       bytes
     )
-    .then(value => new Uint8Array(value))
-    .catch(() => this.randomBytes(20));
+      .then(value => new Uint8Array(value))
+      .catch(() => this.randomBytes(20));
   },
-  hashBytesToString: function(bytes) {
+  hashBytesToString: function (bytes) {
     return this.hashBytesToBytes(bytes)
       .then(value => this.hexString(value))
       .catch(value => this.hexString(value));
   },
-  hashStringToBytes: function(source) {
+  hashStringToBytes: function (source) {
     return this.hashBytesToBytes(aesjs.utils.utf8.toBytes(source))
       .then(value => value)
       .catch(value => value);
   }
-    
+
 };

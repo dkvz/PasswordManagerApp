@@ -395,12 +395,17 @@ npm test
 - [ ] I do not know what happens if some of the source strings provided are empty - I should check for empty data in the API endpoints.
 - [x] Add some sort of spinner when doing the API requests.
 - [ ] There should also be some sort of spinner while we're initializing the index page and processing the JS in site.js.
-- [ ] I don't think the calls to System.GC.Collect() do anything super helpful in the PasswordManagerTools project. I feel like they're slowing everything down by a lot. I should remove them.
+- [x] I don't think the calls to System.GC.Collect() do anything super helpful in the PasswordManagerTools project. I feel like they're slowing everything down by a lot. I should remove them.
 - [x] The password list (HTML select element) looks terrible. Can we do something with the CSS? -> Not really if using the select element as is.
 - [ ] Add a margin left to the close icon for the toaster message, make it bigger too.
 - [ ] Add some sort of check that shows a warning if the connection is not in HTTPS.
 - [ ] Lock an IP address that does too many failed login attempts.
 - [ ] App. directory structure is messed up. I should have a sln project referencing all the others (including the Test project) and have better naming for the directories with C# or JS code.
 - [ ] Show an unsaved changes warning message (using the warning colours) in the notification section when saves need to happen, also show the save button (hide otherwise).
-- [ ] I have serious issues with using text inputs in flex rows, when you resize to minimum width some of the inputs are sticking out of the viewport. We might need a width: 100% on body or something.
+- [ ] I have serious issues with using text inputs in flex rows, when you resize to minimum width some of the inputs are sticking out of the viewport. We might need a width: 100% on body or something (might also be I need display: block instead of inline).
 - [x] To open a new session I created something in SessionManager that returns an enum member. To save the session I did it almost entirely in ApiController. I should be consistent here and pick one or the other. Some methods in ISessionManager won't be needed anymore after the refactoring.
+- [ ] There's a bug with the decryption not working with some session keys (and sometimes only some specific password entries). I might have a problem with my base64 to byte array function.
+- [ ] We could have a big setTimeout that automatically disconnects the session for inactivity, reset or disable it when interacting with the UI.
+- [ ] I'm not super sure what happens if a password is longer than 16 characters. It should pad to always be a multiple of 16 bytes but I should test it. In the same vein I also need to test a password that is exactly 16 characters to see if my JS de-padding works in that case too.
+- [ ] The password field on the second slide show the number of characters in the password; I should probably use placeholder text or find an option to hide the number of characters.
+- [ ] In the JS code there are byte arrays I could clean up from memory at some point but I usually don't bother.

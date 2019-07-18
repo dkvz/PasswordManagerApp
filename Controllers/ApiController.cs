@@ -110,6 +110,7 @@ namespace PasswordManagerApp.Controllers
       By design we just send 403 errors if the entry requested does
       not exist.
        */
+      
       var session = getSession(
         req, 
         Request.HttpContext.Connection.RemoteIpAddress
@@ -151,7 +152,7 @@ namespace PasswordManagerApp.Controllers
                   // We need the name and passwords to not be empty:
                   if (req.Name.Length > 0 && req.Password.Length > 0)
                   {
-                    var entry = session.Data.GetEntry(req.EntryId);
+                    var entry = session.Data.GetEntry(req.EntryId - 1);
                     entry.Name = req.Name;
                     entry.Password = req.Password;
                     entry.Date = DateTime.Now;
@@ -159,12 +160,12 @@ namespace PasswordManagerApp.Controllers
                   }
                   break;
                 case RequestOperation.Delete:
-                  session.Data.RemoveEntry(req.EntryId);
+                  session.Data.RemoveEntry(req.EntryId - 1);
                   return ApiController.success();
                 default:
                   // We can just give the GenericPasswordEntry object
                   // to Json() and it should work fine.
-                  return Json(session.Data.PasswordEntries[req.EntryId]);
+                  return Json(session.Data.PasswordEntries[req.EntryId - 1]);
               }
             }
             catch

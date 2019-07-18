@@ -86,8 +86,7 @@ export function getEntry(sessionId, entryId) {
           if (!isNaN(pDate.getTime())) data.parsedDate = pDate;
           resolve(data);
         });
-      } else 
-        basicPromiseStatusHandler(resp.status, reject);
+      } else basicPromiseStatusHandler(resp.status, reject);
     })
     .catch(reject);
   });

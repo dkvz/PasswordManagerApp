@@ -19,9 +19,10 @@ export function removeNodesFromElement(element) {
   }
 }
 
-export function addHtmlOption(select, text, document, value) {
+export function addHtmlOption(select, text, document, value, { type, callback } = null) {
   const opt = document.createElement('option');
   opt.textContent = text;
   if (value !== undefined) opt.value = value;
+  if (type) opt.addEventListener(type, callback);
   select.appendChild(opt);
 }
