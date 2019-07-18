@@ -31,6 +31,7 @@ if (loginForm) {
   const masterPwd = document.getElementById('masterPassword');
   const dataFile = document.getElementById('dataFile');
   const nameSelect = document.getElementById('nameSelect');
+  const selectEntryForm = document.getElementById('selectEntryForm');
   const sessionIdInput = document.getElementById('sessionId');
   state.sessionId = sessionIdInput ? sessionIdInput.value : '';
 
@@ -141,6 +142,11 @@ if (loginForm) {
           window.location.reload();
         });
     }
+  });
+
+  selectEntryForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
   });
   
   setLoading(loading, false);
