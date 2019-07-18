@@ -27,13 +27,9 @@ namespace PasswordManagerApp.Models.Requests
 
     public RequestOperation Operation { get; set; }
 
-    /// Encrypted master password, used to save
-    /// data modifications to disk.
-    public string MasterPassword { get; set; }
 
     public EntryRequestBody(string sessionId, string password, 
-      string name, int entryId, RequestOperation operation, 
-      string masterPassword) 
+      string name, int entryId, RequestOperation operation) 
       : base(sessionId)
     {
       Password = password != null ? password : "";
@@ -42,7 +38,6 @@ namespace PasswordManagerApp.Models.Requests
         entryId : Math.Abs(entryId);
       Operation = operation >= 0 ? 
         operation : (RequestOperation)Math.Abs((int)operation);
-      MasterPassword = masterPassword;
     }
   }
 }
