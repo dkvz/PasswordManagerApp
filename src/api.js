@@ -161,6 +161,14 @@ export function editEntry(sessionId, entryId, name, password) {
   });
 }
 
+/**
+ * The master password should be encrypted with the
+ * session key.
+ * 
+ * The endpoint gives a 401 error i ncase the given
+ * master password is not the original one used to
+ * encrypt the file.
+ */
 export function saveData(sessionId, masterPassword) {
   return new Promise((resolve, reject) => {
     fetch('/api/v1/save', 
@@ -169,8 +177,18 @@ export function saveData(sessionId, masterPassword) {
     .then(resp => {
       if (resp.status >= 200 && resp.status < 300) {
         resolve(resp);
-      } else 
-        basicPromiseStatusHandler(resp.status, reject);
+      } else {
+        switch(resp.status) {
+          case 401:
+            reject('The master password given is different from the original master password');
+            break;
+          case 403:
+            reject('Unauthorized attempt at saving the data');
+            break;
+          default:
+            reject(`Server error, status ${resp.status}`);
+        }
+      } 
     })
     .catch(reject);
   });

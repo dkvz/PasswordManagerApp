@@ -195,55 +195,33 @@ namespace PasswordManagerApp.Controllers
       // Check if the password is the original one, return
       // a 401 if not.
 
-      // Most of this method should arguably be in 
-      // SessionManager using a SaveSessionResult enum
-      // like the OpenSession one.
+      // At some point things got crazy and most of this 
+      // method got moved to SessionManager.SaveSession.
 
-      if (login.Password != null && login.Password.Length > 0)
+      if (login != null && login.Password != null && login.Password.Length > 0)
       {
-        var session = getSession(
-          login,
-          Request.HttpContext.Connection.RemoteIpAddress
-        );
-        if (session != null && session.Data != null)
+        try
         {
-          byte[] mPwd = null;
-          try
+          var result = _sessionManager.SaveSession(
+            login,
+            Request.HttpContext.Connection.RemoteIpAddress
+          );
+          switch (result)
           {
-            mPwd = Encoding.UTF8.GetBytes(login.Password);
-            if (session.Data.IsOriginalPassword(mPwd))
-            {
-              try
-              {
-                _sessionManager.SaveSessionData(session, mPwd);
-                // Don't forget to return some kind of success
-                // response at some point.
-                return ApiController.success();
-              }
-              catch(CryptographicException)
-              {
-                // Session encryption is not working correctly.
-                // return ApiController.nonAuthorized();
-                // This will end up sending nonAuthorized at the end.
-              }
-            }
-            else
-            {
-              JsonResult res = new JsonResult(new { result = "Wrong master password" });
+            case SaveSessionResults.OriginalPasswordDiffers:
+              var res = new JsonResult(new {result = "Original password differs"});
               res.StatusCode = 401;
               return res;
-            }
+            case SaveSessionResults.Success:
+              return ApiController.success();
           }
-          catch
-          {
-            return ApiController.serverError();
-          }
-          finally
-          {
-            // The byte array might already be cleared but it
-            // doesn't hurt to do it more than one time.
-            if (mPwd != null) Array.Clear(mPwd, 0, mPwd.Length);
-          }
+        }
+        catch (Exception ex)
+        {
+          Console.Error.WriteLine("Error when saving session");
+          Console.Error.WriteLine(ex.StackTrace);
+          Console.Error.WriteLine(ex.ToString());
+          return ApiController.serverError();
         }
       }
       return ApiController.nonAuthorized();

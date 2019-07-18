@@ -3,10 +3,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Linq;
+using System.Text;
 using Microsoft.Extensions.Configuration;
 using PasswordManagerApp.Security;
 using PasswordManager.Security;
 using PasswordManagerApp.Models.Requests;
+using System.Security.Cryptography;
 
 namespace PasswordManagerApp.Models
 {
@@ -66,17 +68,58 @@ namespace PasswordManagerApp.Models
     {
       return HashUtils.ConcatByteArrays(_sequence, session.SessionId);
     }
-    public void SaveSessionData(SecureSession session, byte[] masterPassword)
+    public void saveSessionData(SecureSession session, byte[] masterPassword, byte[] sessionKey)
     {
       var textGenerator = new RandomPlaceholderTextGenerator();
       var fakePwd = textGenerator.RandomString(16); 
-      byte[] key = generateSessionKey(session);
       session.Data.SaveToFile(
         masterPassword,
         ref fakePwd,
         textGenerator,
-        key
+        sessionKey
       );
+    }
+    public SaveSessionResults SaveSession(LoginRequestBody login, IPAddress clientIp)
+    {
+      if (login != null && login.SessionId != null && login.SessionId.Length > 0)
+      {
+        var session = GetSession(login.SessionId, clientIp);
+        if (session != null && session.Data != null)
+        {
+          byte[] key = null;
+          byte[] mPwd = null;
+          try 
+          {
+            key = generateSessionKey(session);
+            try
+            {
+              mPwd = AES256.DecryptToByteArray(login.Password, key);
+            }
+            catch(CryptographicException)
+            {
+              return SaveSessionResults.InvalidPassword;
+            }
+            if (session.Data.IsOriginalPassword(mPwd))
+            {
+              saveSessionData(session, mPwd, key);
+              return SaveSessionResults.Success;
+            }
+            else
+            {
+              return SaveSessionResults.OriginalPasswordDiffers;
+            }
+          }
+          finally
+          {
+            // The byte array might already be cleared but it
+            // doesn't hurt to do it more than one time.
+            if (mPwd != null) Array.Clear(mPwd, 0, mPwd.Length);
+            if (key != null) Array.Clear(key, 0, key.Length);
+          }
+        }
+      }
+      // Could also mean invalid IP address in this case.
+      return SaveSessionResults.InvalidSession;
     }
     public SecureSession CreateSession(IPAddress clientIp)
     {
@@ -133,7 +176,7 @@ namespace PasswordManagerApp.Models
             byte[] dKey = null;
             try
             {
-              dKey = HashUtils.ConcatByteArrays(_sequence, sess.SessionId);
+              dKey = generateSessionKey(sess);
               mPwd = AES256.DecryptToByteArray(login.Password, dKey);
               sess.Data.ReadFromFile(mPwd, dKey);
               return OpenSessionResult.Success;
