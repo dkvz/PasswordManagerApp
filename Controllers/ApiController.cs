@@ -142,7 +142,7 @@ namespace PasswordManagerApp.Controllers
           // Default operation is Read.
           // Reminder: EntryId received from the client start at 
           // index 1 and not 0.
-          if (req.EntryId > 0 && req.EntryId <= _sessionManager.Count)
+          if (req.EntryId > 0 && req.EntryId <= session.Data.PasswordEntries.Count)
           {
             try 
             {
@@ -174,7 +174,6 @@ namespace PasswordManagerApp.Controllers
             }
           }
         }
-        return Json(req);
       }
       return ApiController.nonAuthorized();
     }
