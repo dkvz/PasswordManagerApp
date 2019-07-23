@@ -2,6 +2,7 @@ import aesjs from 'aes-js';
 import pbkdf2 from 'pbkdf2';
 import { Uint8ArrayToBase64, base64ToUint8Array } from './b64Uint8ArrayConversions';
 import { byteArrayToString } from './textConversions';
+import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 const Buffer = require('buffer/').Buffer;
 
 export default {
@@ -81,7 +82,22 @@ export default {
             - The decimal number value of the byte is the amount of padding bytes
           */
 
+          /* 
+          OK so it looks like there are two ways to pad, another one just puts
+          bytes with value 0 at the end. So in that case we have to remove the 
+          bytes that are "0".
+          */
+
+          /*
+          OK so I think the server uses a different padding method. I might have to
+          implement to zero-padding here.
+          */
+
           const lastB = decryptedBytes[decryptedBytes.length - 1];
+
+          console.log(`Decrypted last byte is: ${lastB}`);
+          console.log(decryptedBytes);
+
           if (lastB > 0 && lastB <= 16) {
             resolve(
               byteArrayToString(
@@ -91,6 +107,17 @@ export default {
                 )
               )
             )
+          } else if (lastB === 0) {
+            // Remove all the trailing bytes that are 0.
+            // Find the last one that is 0. We could start
+            // searching at the last multiple of block size
+            // but I'm not bothering with that.
+            resolve(byteArrayToString(
+              decryptedBytes.subarray(
+                0,
+                decryptedBytes.length - decryptedBytes.indexOf(0)
+              )
+            ))
           } else {
             resolve(byteArrayToString(decryptedBytes));
           }
