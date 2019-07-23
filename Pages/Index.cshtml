@@ -17,8 +17,8 @@
         <input type="password" id="modalPasswordInput" />
       </div>
       <div class="flex-form-row no-mb">
-        <button type="button" class="btn" id="modalCancelBtn">Cancel</button>
-        <button type="submit" class="btn" id="modalOKBtn">OK</button>
+        <button type="button" class="btn" id="passwordModalCancelBtn">Cancel</button>
+        <button type="submit" class="btn" id="passwordModalOKBtn">OK</button>
       </div>
     </form>
   </div>
@@ -64,11 +64,15 @@
   </section>
   <section class="future">
 
-    <div class="flex-form-row">
-      <h1>Don't leave this tab open!</h1>
+    <div class="flex-form-row no-mb">
+      <div class="big-text">Don't leave this tab open!</div>
       <button class="btn" type="button" id="logoutBtn">Logout</button>
     </div>
-    <input type="text" id="filterInput" placeholder="Filter..." />
+    <div class="flex-form-row no-mb d-none" id="unsavedChanges">
+      <div class="medium-text text-warn">You have unsaved changes</div>
+      <button class="btn" type="button" id="saveChangesBtn">Save changes</button>
+    </div>
+    <input class="mt-1" type="text" id="filterInput" placeholder="Filter..." />
     <form id="selectEntryForm" class="flex-form mb-1" method="post">
       <select id="nameSelect" size="10">
         <!-- Filled by JS -->
@@ -104,6 +108,8 @@
     </div>
 
     <p id="entryDate"></p>
+
+    <input type="password" id="hiddenPasswordInput" class="d-none" />
 
   </section>
 </div>

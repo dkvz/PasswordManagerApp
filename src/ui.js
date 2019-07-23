@@ -6,8 +6,12 @@ export function showSuccessSlide(slides) {
 }
 
 export function setLoading(element, isLoading) {
-  element.style.display = isLoading ? 'block' : '';
-  if (isLoading) 
+  showModal(element, isLoading);
+}
+
+export function showModal(element, show) {
+  element.style.display = show ? 'block' : '';
+  if (show) 
     document.body.setAttribute('data-overlay', true);
   else 
     document.body.removeAttribute('data-overlay');
