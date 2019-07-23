@@ -128,7 +128,7 @@ namespace PasswordManagerApp.Controllers
             {
               // This endpoint doesn't actually save the changes to disk.
               session.Data.AddEntry(req.Name, req.Password);
-              ApiController.success();
+              return ApiController.success();
             }
             catch
             {

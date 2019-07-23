@@ -49,7 +49,6 @@ if (loginForm) {
   const modalPasswordInput = document.getElementById('modalPasswordInput');
   const passwordModal = document.getElementById('passwordModal');
   const unsavedChanges = document.getElementById('unsavedChanges');
-  const saveChangesBtn = document.getElementById('saveChangesBtn');
   const sessionIdInput = document.getElementById('sessionId');
   state.sessionId = sessionIdInput ? sessionIdInput.value : '';
 
@@ -71,7 +70,7 @@ if (loginForm) {
     // Actually it's so fast that I won't for now.
     state.toaster.close();
     state.entryId = 0;
-    if (nameSelect.selectedIndex !== undefined) {
+    if (nameSelect.selectedIndex !== undefined && nameSelect.selectedIndex >= 0) {
       const entryId = nameSelect.options[nameSelect.selectedIndex].value;
       getEntry(state.sessionHash, entryId)
         .then(data => {
@@ -297,11 +296,39 @@ if (loginForm) {
     showModal(passwordModal, true);
   });
 
-  document.getElementById('passwordModalOKBtn').addEventListener('click', () => {
+  document.getElementById('mPwdForm').addEventListener('submit', (e) => {
+    e.preventDefault();
     // Confirm to the server that we want to save the changes.
     // Don't forget to hide the savechanges section thingy in case of success.
-    setLoading(loading, true);
-    
+    if (modalPasswordInput.value !== undefined && modalPasswordInput.value.length > 0) {
+      // Close the password modal:
+      showModal(passwordModal, false);
+      state.toaster.close();
+      setLoading(loading, true);
+      aes.encrypt(modalPasswordInput.value, state.key)
+        .then(encryptedPwd => {
+          saveData(state.sessionHash, encryptedPwd)
+            .then(() => {
+              showUnsavedChanges(false);
+              refreshNames().then(
+                () => {
+                  state.toaster.info('Data has been saved on the server');
+                  setLoading(loading, false);
+                }).catch(() => {
+                  state.toaster.error('Could not refresh data from the server');
+                  setLoading(loading, false);
+                });
+            })
+            .catch(err => {
+              state.toaster.error(`Error trying to save data on the server: ${err}`);
+              setLoading(loading, false);
+            });
+        })
+        .catch(err => {
+          state.toaster.error(`Encryption error: ${err}`);
+          setLoading(loading, false);
+        });
+    }
   });
 
   document.getElementById('passwordModalCancelBtn').addEventListener('click', () => {
