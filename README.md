@@ -408,3 +408,4 @@ npm test
 - [ ] I'm not super sure what happens if a password is longer than 16 characters. It should pad to always be a multiple of 16 bytes but I should test it. In the same vein I also need to test a password that is exactly 16 characters to see if my JS de-padding works in that case too.
 - [ ] The password field on the second slide show the number of characters in the password; I should probably use placeholder text or find an option to hide the number of characters.
 - [ ] In the JS code there are byte arrays I could clean up from memory at some point but I usually don't bother.
+- [ ] The copy to clipboard thingy should first look if hiddenPasswordInput.value is empty and copy the visible field instead in that case.

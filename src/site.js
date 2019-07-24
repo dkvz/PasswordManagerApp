@@ -81,7 +81,9 @@ if (loginForm) {
                 nameInput.value = data.name;
                 entryDate.textContent =
                   `Last modified: ${data.parsedDate.toLocaleDateString()}`;
-                passwordInput.value = pwd;
+                hiddenPasswordInput.value = pwd;
+                passwordInput.value = '';
+                passwordInput.placeholder = 'Password hidden';
                 state.entryId = entryId;
               })
               .catch(err => {
@@ -224,7 +226,7 @@ if (loginForm) {
 
   document.getElementById('saveBtn').addEventListener('click', () => {
     const name = nameInput.value.trim();
-    const pwd = passwordInput.value;
+    const pwd = passwordInput.value || hiddenPasswordInput.value;
     state.toaster.close();
     if (name.length > 0 && pwd.length > 0) {
       setLoading(loading, true);
