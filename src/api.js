@@ -146,7 +146,7 @@ export function editEntry(sessionId, entryId, name, password) {
           entryId,
           name,
           password,
-          operation: 1
+          operation: 2
         }
       )
     )

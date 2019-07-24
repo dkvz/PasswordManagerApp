@@ -2,7 +2,6 @@ import aesjs from 'aes-js';
 import pbkdf2 from 'pbkdf2';
 import { Uint8ArrayToBase64, base64ToUint8Array } from './b64Uint8ArrayConversions';
 import { byteArrayToString } from './textConversions';
-import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 const Buffer = require('buffer/').Buffer;
 
 export default {
@@ -91,12 +90,12 @@ export default {
           /*
           OK so I think the server uses a different padding method. I might have to
           implement to zero-padding here.
+
+          -> In the end I also remove the padding on server so I'm not sur if that's
+             ever going to be useful.
           */
 
           const lastB = decryptedBytes[decryptedBytes.length - 1];
-
-          console.log(`Decrypted last byte is: ${lastB}`);
-          console.log(decryptedBytes);
 
           if (lastB > 0 && lastB <= 16) {
             resolve(

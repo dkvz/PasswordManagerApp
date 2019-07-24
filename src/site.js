@@ -293,7 +293,9 @@ if (loginForm) {
 
   document.getElementById('saveChangesBtn').addEventListener('click', () => {
     // We need to ask for the master password using the modal.
+    modalPasswordInput.value = '';
     showModal(passwordModal, true);
+    modalPasswordInput.focus();
   });
 
   document.getElementById('mPwdForm').addEventListener('submit', (e) => {
