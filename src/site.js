@@ -366,6 +366,21 @@ if (loginForm) {
     showPassword(!state.passwordVisible)
   );
 
+  document.getElementById('clipboardBtn').addEventListener('click', () => {
+    if (navigator.clipboard) {
+      if (state.entryId) {
+        navigator.clipboard.writeText(
+          state.passwordVisible ? 
+            passwordInput.value : 
+            hiddenPasswordInput.value
+        );
+      }
+    } else {
+      // I actually used alert() :D
+      alert('Your browser does\'t have the required clipboard API');
+    }
+  });
+
   setLoading(loading, false);
 
 }
