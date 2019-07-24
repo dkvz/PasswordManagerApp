@@ -35,6 +35,8 @@ namespace PasswordManagerApp
       services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
       // Adding my SessionManager singleton for dependency injection:
       services.AddSingleton<ISessionManager, SessionManager>();
+      // Adding the singleton responsible for notifications:
+      services.AddSingleton<INotificationManager, NotificationManager>();
       // Periodic session clean up service:
       services.AddHostedService<CleanUpHostedService>();
     }

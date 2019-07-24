@@ -25,10 +25,12 @@ namespace PasswordManagerApp.Controllers
   {
 
     private ISessionManager _sessionManager;
+    private INotificationManager _notificationManager;
 
-    public ApiController(ISessionManager sessionManager)
+    public ApiController(ISessionManager sessionManager, INotificationManager notificationManager)
     {
       _sessionManager = sessionManager;
+      _notificationManager = notificationManager;
     }
 
     [HttpGet]
@@ -111,9 +113,10 @@ namespace PasswordManagerApp.Controllers
       not exist.
        */
       
+      var clientIp = Request.HttpContext.Connection.RemoteIpAddress;
       var session = getSession(
         req, 
-        Request.HttpContext.Connection.RemoteIpAddress
+        clientIp
       );
       if (session != null && session.Data != null && session.Data.IsEncryptedList)
       {
@@ -174,6 +177,13 @@ namespace PasswordManagerApp.Controllers
             }
           }
         }
+      } else {
+        _notificationManager.NotifyMostChannels(
+          NotificationManager.CauseUnauthorizedApiAccess,
+          "Unauthorized Entry API endpoint call",
+          $"name: {req.Name}; op: {req.Operation}; entryId: {req.EntryId}",
+          clientIp
+        );
       }
       return ApiController.nonAuthorized();
     }

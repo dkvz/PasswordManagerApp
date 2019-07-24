@@ -410,3 +410,4 @@ npm test
 - [ ] In the JS code there are byte arrays I could clean up from memory at some point but I usually don't bother.
 - [x] The copy to clipboard thingy should first look if hiddenPasswordInput.value is empty and copy the visible field instead in that case.
 - [ ] Add a button to clear the clipboard.
+- [ ] Rather than using Console.Error.WriteLine et al. in many places I should inject the ILogger and use that.

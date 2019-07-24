@@ -31,15 +31,17 @@ namespace PasswordManagerApp.Models
     public int GridHeight { get; private set; }
     private bool _cleaningUp = false;
     private IConfiguration _config;
+    private INotificationManager _notificationManager;
     private TimeSpan _max_age = TimeSpan.FromMinutes(SessionManager.MAX_SESSION_AGE);
     private List<string> _dataFiles;
     private string _dataPath;
     private byte[] _sequence;
 
-    public SessionManager(IConfiguration config)
+    public SessionManager(IConfiguration config, INotificationManager notificationManager)
     {
       Sessions = new ConcurrentDictionary<string, SecureSession>();
       _config = config;
+      _notificationManager = notificationManager;
       var files = _config.GetSection("dataFiles").Get<List<string>>();
       _dataPath = _config.GetValue<string>("dataPath") ?? "var/";
       // We don't need to keep the sequence in clear text, hash it:
@@ -179,13 +181,24 @@ namespace PasswordManagerApp.Models
               dKey = generateSessionKey(sess);
               mPwd = AES256.DecryptToByteArray(login.Password, dKey);
               sess.Data.ReadFromFile(mPwd, dKey);
+              _notificationManager.NotifyMostChannels(
+                NotificationManager.CauseLoginSuccess,
+                "Successful login",
+                null,
+                clientIp
+              );
               return OpenSessionResult.Success;
             }
             catch (Exception ex)
             {
               Console.Error.WriteLine($"Password Data File processing error: {ex.ToString()}");
-              Console.Error.WriteLine(ex.StackTrace);
               sess.Data = null;
+              _notificationManager.NotifyMostChannels(
+                NotificationManager.CauseLoginFailure,
+                "Failed login attempt",
+                null,
+                clientIp
+              );
               return OpenSessionResult.InvalidPasswordOrFSError;
             }
             finally
@@ -197,7 +210,16 @@ namespace PasswordManagerApp.Models
           }
           else return OpenSessionResult.DataFileError;
         }
-        else return OpenSessionResult.IpAddressNotAllowed;
+        else 
+        {
+          _notificationManager.NotifyMostChannels(
+            NotificationManager.CauseLoginFailure,
+            "Login attempt with IP address different from session",
+            null,
+            clientIp
+          );
+          return OpenSessionResult.IpAddressNotAllowed;
+        }
       }
       else return OpenSessionResult.InvalidSessionId;
     }
