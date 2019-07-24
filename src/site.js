@@ -25,7 +25,8 @@ const loginForm = document.getElementById('loginForm');
 if (loginForm) {
   // We're on the login page:
   const state = {
-    sequence: []
+    sequence: [],
+    passwordVisible: false
   };
 
   // Put up loading screen while initializing:
@@ -49,6 +50,7 @@ if (loginForm) {
   const modalPasswordInput = document.getElementById('modalPasswordInput');
   const passwordModal = document.getElementById('passwordModal');
   const unsavedChanges = document.getElementById('unsavedChanges');
+  const showHideBtnImg = document.querySelector('#showHideBtn img');
   const sessionIdInput = document.getElementById('sessionId');
   state.sessionId = sessionIdInput ? sessionIdInput.value : '';
 
@@ -63,6 +65,21 @@ if (loginForm) {
       e.currentTarget.getAttribute('data-x') + ',' +
       e.currentTarget.getAttribute('data-y')
     );
+  };
+
+  const showPassword = (show) => {
+    state.passwordVisible = show;
+    if (show) {
+      showHideBtnImg.src = '/images/eye-slash.svg';
+      passwordInput.value = hiddenPasswordInput.value;
+      passwordInput.type = 'text';
+      passwordInput.removeAttribute('placeholder');
+    } else {
+      showHideBtnImg.src = '/images/eye.svg';
+      passwordInput.value = '';
+      passwordInput.type = 'password';
+      passwordInput.setAttribute('placeholder', 'Password hidden');
+    }
   };
 
   const getSelectedEntry = () => {
@@ -82,8 +99,7 @@ if (loginForm) {
                 entryDate.textContent =
                   `Last modified: ${data.parsedDate.toLocaleDateString()}`;
                 hiddenPasswordInput.value = pwd;
-                passwordInput.value = '';
-                passwordInput.placeholder = 'Password hidden';
+                showPassword(false);
                 state.entryId = entryId;
               })
               .catch(err => {
@@ -217,6 +233,8 @@ if (loginForm) {
   document.getElementById('newBtn').addEventListener('click', () => {
     state.entryId = 0;
     // Focus the name entry field:
+    showPassword(false);
+    passwordInput.setAttribute('placeholder', 'Enter new password');
     nameInput.value = '';
     nameInput.focus();
     nameInput.scrollIntoView();
@@ -343,6 +361,10 @@ if (loginForm) {
     e.preventDefault();
     getSelectedEntry();
   });
+
+  document.getElementById('showHideBtn').addEventListener('click', () => 
+    showPassword(!state.passwordVisible)
+  );
 
   setLoading(loading, false);
 

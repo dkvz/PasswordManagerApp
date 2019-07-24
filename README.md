@@ -401,11 +401,12 @@ npm test
 - [ ] Add some sort of check that shows a warning if the connection is not in HTTPS.
 - [ ] Lock an IP address that does too many failed login attempts.
 - [ ] App. directory structure is messed up. I should have a sln project referencing all the others (including the Test project) and have better naming for the directories with C# or JS code.
-- [ ] Show an unsaved changes warning message (using the warning colours) in the notification section when saves need to happen, also show the save button (hide otherwise).
+- [x] Show an unsaved changes warning message (using the warning colours) in the notification section when saves need to happen, also show the save button (hide otherwise).
 - [ ] I have serious issues with using text inputs in flex rows, when you resize to minimum width some of the inputs are sticking out of the viewport. We might need a width: 100% on body or something (might also be I need display: block instead of inline).
 - [x] To open a new session I created something in SessionManager that returns an enum member. To save the session I did it almost entirely in ApiController. I should be consistent here and pick one or the other. Some methods in ISessionManager won't be needed anymore after the refactoring.
 - [ ] We could have a big setTimeout that automatically disconnects the session for inactivity, reset or disable it when interacting with the UI.
 - [ ] I'm not super sure what happens if a password is longer than 16 characters. It should pad to always be a multiple of 16 bytes but I should test it. In the same vein I also need to test a password that is exactly 16 characters to see if my JS de-padding works in that case too.
-- [ ] The password field on the second slide show the number of characters in the password; I should probably use placeholder text or find an option to hide the number of characters.
+- [x] The password field on the second slide show the number of characters in the password; I should probably use placeholder text or find an option to hide the number of characters.
 - [ ] In the JS code there are byte arrays I could clean up from memory at some point but I usually don't bother.
 - [ ] The copy to clipboard thingy should first look if hiddenPasswordInput.value is empty and copy the visible field instead in that case.
+- [ ] Add a button to clear the clipboard.
