@@ -51,6 +51,7 @@ if (loginForm) {
   const passwordModal = document.getElementById('passwordModal');
   const unsavedChanges = document.getElementById('unsavedChanges');
   const showHideBtnImg = document.querySelector('#showHideBtn img');
+  const filterInput = document.getElementById('filterInput');
   const sessionIdInput = document.getElementById('sessionId');
   state.sessionId = sessionIdInput ? sessionIdInput.value : '';
 
@@ -114,26 +115,31 @@ if (loginForm) {
     }
   };
 
+  const updateEntryList = (names) => {
+    removeNodesFromElement(nameSelect);
+    names.forEach(
+      (e) =>
+        addHtmlOption(
+          nameSelect,
+          e.name,
+          document,
+          e.index,
+          { type: 'dblclick', callback: getSelectedEntry }
+        )
+    );
+  };
+
   const refreshNames = () => {
     return new Promise((resolve) => {
+      filterInput.value = '';
       getNames(state.sessionHash)
         .then(data => {
-          removeNodesFromElement(nameSelect);
           state.names = data.map((n, i) => ({ name: n, index: i + 1 }))
             .sort(
               (a, b) =>
                 a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
             );
-          state.names.forEach(
-            (e) =>
-              addHtmlOption(
-                nameSelect,
-                e.name,
-                document,
-                e.index,
-                { type: 'dblclick', callback: getSelectedEntry }
-              )
-          );
+          updateEntryList(state.names);
           resolve(true);
         })
         .catch(err => {
@@ -229,7 +235,21 @@ if (loginForm) {
     }
   });
 
+  filterInput.addEventListener('input', (e) => {
+    if (e.currentTarget.value) {
+      updateEntryList(
+        state.names.filter(n => 
+            n.name.toLowerCase().indexOf(e.currentTarget.value) >= 0)
+      );
+    } else {
+      updateEntryList(state.names);
+    }
+  });
+  
+  
   // Events for the second slide:
+  // ----------------------------
+
   document.getElementById('newBtn').addEventListener('click', () => {
     state.entryId = 0;
     // Focus the name entry field:

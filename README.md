@@ -397,7 +397,7 @@ npm test
 - [ ] There should also be some sort of spinner while we're initializing the index page and processing the JS in site.js.
 - [x] I don't think the calls to System.GC.Collect() do anything super helpful in the PasswordManagerTools project. I feel like they're slowing everything down by a lot. I should remove them.
 - [x] The password list (HTML select element) looks terrible. Can we do something with the CSS? -> Not really if using the select element as is.
-- [ ] Add a margin left to the close icon for the toaster message, make it bigger too.
+- [x] Add a margin left to the close icon for the toaster message.
 - [ ] Add some sort of check that shows a warning if the connection is not in HTTPS.
 - [ ] Lock an IP address that does too many failed login attempts.
 - [ ] App. directory structure is messed up. I should have a sln project referencing all the others (including the Test project) and have better naming for the directories with C# or JS code.
@@ -408,5 +408,5 @@ npm test
 - [ ] I'm not super sure what happens if a password is longer than 16 characters. It should pad to always be a multiple of 16 bytes but I should test it. In the same vein I also need to test a password that is exactly 16 characters to see if my JS de-padding works in that case too.
 - [x] The password field on the second slide show the number of characters in the password; I should probably use placeholder text or find an option to hide the number of characters.
 - [ ] In the JS code there are byte arrays I could clean up from memory at some point but I usually don't bother.
-- [ ] The copy to clipboard thingy should first look if hiddenPasswordInput.value is empty and copy the visible field instead in that case.
+- [x] The copy to clipboard thingy should first look if hiddenPasswordInput.value is empty and copy the visible field instead in that case.
 - [ ] Add a button to clear the clipboard.
