@@ -80,7 +80,7 @@ You can copy and adapt the script below (check destination directory) into `/etc
 Description=Password Manager .NET Core App
 
 [Service]
-WorkingDirectory=/srv/vhosts/PasswordManagerApp/current
+WorkingDirectory=/srv/vhosts/password_manager/current
 ExecStart=PasswordManagerApp
 Restart=always
 # Restart service after 10 seconds if the dotnet service crashes:
@@ -101,8 +101,12 @@ If the service can start correctly you will want to register it to start with th
 systemctl enable password-manager
 ```
 
+#### Reverse proxy configuration
+I'm going to use the simplest configuration I can.
 
+Just keep in mind that if your dotnet app is listening to port 5001 you can use that one in HTTPS and make it harder to try and compromise passwords by capturing packets on the loopback interface.
 
+Otherwise, the HTTP port is 5000.
 
 ### References
 These two pages have a lot of useful information:
@@ -467,6 +471,15 @@ To make it easier I added that as an npm script and thus can use:
 npm test
 ```
 
+# Security considerations
+It would actually be better to have the app being called through HTTPS but for some reason the self contained published app doesn't bind the HTTPS port on Linux (it seems to do it on Windows).
+
+By intercepting packets on the loopback address on the server itself and with access to the secret sequence, it's possible to extract the master password from a full session communication.
+
+This is of course also possible through extensive memory dumping but that is **much** harder to pull off.
+
+I'm going to add a todo post to try and get the HTTPS Kestrel support.
+
 # TODO
 - [x] Remove the old project from Github -> Made it private.
 - [x] Use CSS variables while I'm at it.
@@ -506,3 +519,4 @@ npm test
 - [ ] Rather than using Console.Error.WriteLine et al. in many places I should inject the ILogger and use that.
 - [ ] I should have some sort of error callback for the email notifications and/or add an API endpoint only available on localhost that sends a test email.
 - [ ] Limit the amount of data the process is logging onto the console in production.
+- [ ] Try to get kestrel to serve HTTPS with the Linux production build as well. For some reason it's not binding https://localhost:5001 with the self-contained Linux build.
