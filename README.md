@@ -411,3 +411,4 @@ npm test
 - [x] The copy to clipboard thingy should first look if hiddenPasswordInput.value is empty and copy the visible field instead in that case.
 - [ ] Add a button to clear the clipboard.
 - [ ] Rather than using Console.Error.WriteLine et al. in many places I should inject the ILogger and use that.
+- [ ] I should have some sort of error callback for the email notifications and/or add an API endpoint only available on localhost that sends a test email.

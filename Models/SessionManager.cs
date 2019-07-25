@@ -221,7 +221,16 @@ namespace PasswordManagerApp.Models
           return OpenSessionResult.IpAddressNotAllowed;
         }
       }
-      else return OpenSessionResult.InvalidSessionId;
+      else 
+      {
+        _notificationManager.NotifyMostChannels(
+          NotificationManager.CauseLoginFailure,
+          "Login attempt with wrong session ID or sequence",
+          login.SessionId,
+          clientIp
+        );
+        return OpenSessionResult.InvalidSessionId;
+      }
     }
 
     public bool CloseSession(string sessionId, IPAddress clientIp)
