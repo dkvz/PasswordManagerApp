@@ -1,12 +1,13 @@
 {
   "name": "password-manager-app",
   "version": "1.0.0",
-  "description": "Personal Password Manager app. \"database\" is altered using a CLI utility",
+  "description": "Personal Password Manager app. The \"database\" has to be created using a separate CLI tool",
   "main": "site.js",
   "scripts": {
     "test": "dotnet test submodules/Tests",
     "build-assets": "npx parcel build src/site.js -d wwwroot/assets --public-url /assets",
-    "build-win": "npm run build-assets && dotnet publish --configuration Release -r win-x64",
+    "build-win": "npm run build-assets && dotnet publish -c Release -r win-x64",
+    "build-linux": "npm run build-assets && dotnet publish -c Release -r debian-x64",
     "dev": "concurrently -k \"npx parcel watch src/site.js -d wwwroot/assets --public-url /assets\" \"dotnet watch run\""
   },
   "repository": {
@@ -14,7 +15,7 @@
     "url": "git+https://github.com/dkvz/PasswordManagerApp.git"
   },
   "author": "DkVZ",
-  "license": "ISC",
+  "license": "FUCHS",
   "bugs": {
     "url": "https://github.com/dkvz/PasswordManagerApp/issues"
   },

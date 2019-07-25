@@ -46,6 +46,72 @@ npm run dev
 ```
 
 ## Building for production
+
+### In short
+My target hosting environment is Linux, behind a reverse proxy.
+
+Without specifying a build target you can create a .dll assembly that will run on any platform on which there is a .NET Core runtime installed.
+
+You could also create a self-contained deployment that ships with the .NET Core runtime and so does not have any requirement.
+
+I think I'm going to go for that route. I thought you needed to add the `--self-contained true` switch but from what I've seen in Github issues, self-contained is on by default.
+
+Also I get a weird bug if I force it telling me that I need to provide a runtime identifier, when I have provided one.
+The "bug" might be happening because I'm referencing the PasswordManagerTools project in the main project.
+
+To create the production build:
+```
+npm run build-linux
+```
+
+- You have to copy the "publish" directory that should be somewhere along the lines of `bin\Release\netcoreapp2.2\debian-x64` for the current build target I'm using.
+- In that directory there is an executable called "PasswordManagerApp", make it executable.
+- Create the production config file by copying `appsettings.Development.json` into `appsettings.Production.json`.
+- Adapt the production config, you should remove all the "logging" stuff as the default has the verbosity we want, also set the right secret sequence you want to use and make sure the SMTP / notifications settings are correct.
+- Create var/data and put at least a password file in there (you can generate one with [the CLI project](https://github.com/dkvz/PasswordManagerTools)). Make sure the directory is writable by the user that will run the service (I use www-data).
+- Reference the password file in appsettings.Production.json.
+
+#### Systemd service
+You can now create a systemd service for the app.
+
+You can copy and adapt the script below (check destination directory) into `/etc/systemd/system/password-manager.service`.
+```ini
+[Unit]
+Description=Password Manager .NET Core App
+
+[Service]
+WorkingDirectory=/srv/vhosts/PasswordManagerApp/current
+ExecStart=PasswordManagerApp
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=PasswordManager
+User=www-data
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+[Install]
+WantedBy=multi-user.target
+```
+I copied the script from [there](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-2.2#monitor-the-app).
+
+If the service can start correctly you will want to register it to start with the server:
+```
+systemctl enable password-manager
+```
+
+
+
+
+### References
+These two pages have a lot of useful information:
+* https://docs.microsoft.com/en-us/dotnet/core/deploying/deploy-with-cli
+* https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-2.2
+
+### Early build options
+**NB:** Build options are actually quite complex, a lot is discussed below.
+
 Use the following to create a Windows exe:
 ```
 dotnet publish --configuration Release -r win-x64
@@ -84,6 +150,32 @@ The static content is still absent from the exe. I found [a page](https://www.le
 The "good" news is that this confirms the app is not bundling/minifying anything in that state. It's possible to add a NuGet package to do it, or we do it ourselves. It could even be done in a separate project.
 
 I'm going to need npm for client encryption packages so I might as well setup a bundler like Parcel. More on that later.
+
+### Runtime identifiers
+There is a list of runtime identifiers here: https://docs.microsoft.com/en-us/dotnet/core/rid-catalog
+
+You can give a runtime identifier to the "-r" option of ``dotnet publish`, that's what we did for the useless "build-win" script that was in package.json (and might still be in there).
+
+For my Linux build I'm just going to use "linux-x64".
+
+### Reverse proxy consideration
+To make sure we get the right client IP we have to make it so that the .NET app is aware of X-Forwarded-* headers.
+
+In Startup.cs, in the Configure method, we need to add a new middleware:
+```cs
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+  ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+```
+
+Which requires the following using statement:
+```cs
+using Microsoft.AspNetCore.HttpOverrides;
+```
+
+The app will only trust proxies calling from localhost. See [here](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-2.2#configure-a-reverse-proxy-server) for information about trusting other proxies.
+
 
 ## Layout modifications
 I had to heavily modify the existing pages since I don't want Bootstrap, JQuery etc.
@@ -379,22 +471,23 @@ npm test
 - [x] Remove the old project from Github -> Made it private.
 - [x] Use CSS variables while I'm at it.
 - [x] There doesn't seem to be a handler for error 404s -> Quick fixed this by adding `app.UseStatusCodePages();``in Startup.cs. Not awesome but it works.
-- [ ] Email notifications for failed login attempts, log all the successful logins somewhere.
-- [ ] Log all of the attempts somwhere.
+- [x] Email notifications for failed login attempts, log all the successful logins somewhere.
+- [x] Log all of the attempts somwhere.
 - [x] The `asp-append-version="true"` thing doesn't work at all with the production release, the version ID's are gone. -> It does work, the correct exe is in PasswordManagerApp\bin\Release\netcoreapp2.2\win-x64\publish or equivalent.
 - [x] I have a 404 on the source maps - They don't seem to be available through Kestrel, probably because they're referenced as being at the root in the files (as in /sites.css.map instead of /assets/sites.css/map) (we juste need to add --public-url to parcel).
 - [x] Add Babel just for the fun of it and also because my cheap browser check in Index.cshtml encompasses browsers that have no ES6 support -> Parcel just auto babelifies ES6.
 - [ ] Double check if the ClientIp we save in SecureSession objects works with X-Forwarded-For when deployed in production, because there's some chance it doesn't.
 - [x] Uses or Random in PasswordManagerTools should be replaced with the secured version - It's a TODO item in that project as well -> For what it's used over there it does'nt matter.
 - [ ] SessionManager is not thread safe. But I think that would be one of the worst cost/benefit change I could make.
-- [ ] A cookie called .AspNet.Consent is sent with requests. We might want to get rid of it.
-- [ ] TestRequest.cs should be removed.
+- [x] A cookie called .AspNet.Consent is sent with requests. We might want to get rid of it.
+- [ ] I got rid of the Consent cookie but now there's another one called "anti forgery" or something. What is that about?
+- [x] TestRequest.cs should be removed.
 - [x] Re-test the whole session clean up thing.
 - [x] The file selected at login has to be sanitized before it's used on the backend. We should probably just send the position in the list.
 - [x] Change the title when the view changes.
 - [ ] I do not know what happens if some of the source strings provided are empty - I should check for empty data in the API endpoints.
 - [x] Add some sort of spinner when doing the API requests.
-- [ ] There should also be some sort of spinner while we're initializing the index page and processing the JS in site.js.
+- [x] There should also be some sort of spinner while we're initializing the index page and processing the JS in site.js.
 - [x] I don't think the calls to System.GC.Collect() do anything super helpful in the PasswordManagerTools project. I feel like they're slowing everything down by a lot. I should remove them.
 - [x] The password list (HTML select element) looks terrible. Can we do something with the CSS? -> Not really if using the select element as is.
 - [x] Add a margin left to the close icon for the toaster message.
@@ -405,10 +498,11 @@ npm test
 - [ ] I have serious issues with using text inputs in flex rows, when you resize to minimum width some of the inputs are sticking out of the viewport. We might need a width: 100% on body or something (might also be I need display: block instead of inline).
 - [x] To open a new session I created something in SessionManager that returns an enum member. To save the session I did it almost entirely in ApiController. I should be consistent here and pick one or the other. Some methods in ISessionManager won't be needed anymore after the refactoring.
 - [ ] We could have a big setTimeout that automatically disconnects the session for inactivity, reset or disable it when interacting with the UI.
-- [ ] I'm not super sure what happens if a password is longer than 16 characters. It should pad to always be a multiple of 16 bytes but I should test it. In the same vein I also need to test a password that is exactly 16 characters to see if my JS de-padding works in that case too.
+- [x] I'm not super sure what happens if a password is longer than 16 characters. It should pad to always be a multiple of 16 bytes but I should test it. In the same vein I also need to test a password that is exactly 16 characters to see if my JS de-padding works in that case too.
 - [x] The password field on the second slide show the number of characters in the password; I should probably use placeholder text or find an option to hide the number of characters.
 - [ ] In the JS code there are byte arrays I could clean up from memory at some point but I usually don't bother.
 - [x] The copy to clipboard thingy should first look if hiddenPasswordInput.value is empty and copy the visible field instead in that case.
 - [ ] Add a button to clear the clipboard.
 - [ ] Rather than using Console.Error.WriteLine et al. in many places I should inject the ILogger and use that.
 - [ ] I should have some sort of error callback for the email notifications and/or add an API endpoint only available on localhost that sends a test email.
+- [ ] Limit the amount of data the process is logging onto the console in production.
