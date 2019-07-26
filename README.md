@@ -64,7 +64,7 @@ To create the production build:
 npm run build-linux
 ```
 
-- You have to copy the "publish" directory that should be somewhere along the lines of `bin\Release\netcoreapp2.2\debian-x64` for the current build target I'm using.
+- You have to copy the "publish" directory that should be somewhere along the lines of `bin\Release\netcoreapp2.2\debian-x64` for the current build target I'm using - You should probably zip the thing because it's made of a LOT of different small files.
 - In that directory there is an executable called "PasswordManagerApp", make it executable.
 - Create the production config file by copying `appsettings.Development.json` into `appsettings.Production.json`.
 - Adapt the production config, you should remove all the "logging" stuff as the default has the verbosity we want, also set the right secret sequence you want to use and make sure the SMTP / notifications settings are correct.
