@@ -67,9 +67,11 @@ npm run build-linux
 - You have to copy the "publish" directory that should be somewhere along the lines of `bin\Release\netcoreapp2.2\debian-x64` for the current build target I'm using - You should probably zip the thing because it's made of a LOT of different small files.
 - In that directory there is an executable called "PasswordManagerApp", make it executable.
 - Create the production config file by copying `appsettings.Development.json` into `appsettings.Production.json`.
+- Give that file to the user that will run the app (www-data in my case) and chmod it to 700.
 - Adapt the production config, you should remove all the "logging" stuff as the default has the verbosity we want, also set the right secret sequence you want to use and make sure the SMTP / notifications settings are correct.
 - Create var/data and put at least a password file in there (you can generate one with [the CLI project](https://github.com/dkvz/PasswordManagerTools)). Make sure the directory is writable by the user that will run the service (I use www-data).
 - Reference the password file in appsettings.Production.json.
+- You can also chmod the password file 700.
 
 #### Systemd service
 You can now create a systemd service for the app.
@@ -81,7 +83,7 @@ Description=Password Manager .NET Core App
 
 [Service]
 WorkingDirectory=/srv/vhosts/password_manager/current
-ExecStart=PasswordManagerApp
+ExecStart=/srv/vhosts/password_manager/current/PasswordManagerApp
 Restart=always
 # Restart service after 10 seconds if the dotnet service crashes:
 RestartSec=10
@@ -100,6 +102,18 @@ If the service can start correctly you will want to register it to start with th
 ```
 systemctl enable password-manager
 ```
+
+By default it should log to syslog, and so the app output will end up in /var/log/syslog.
+
+You can use rsyslog to split the file to its own separate log (app will still log to /var/log/syslog as well):
+- Create a file called "password-manager.conf" in /etc/rsyslog.d/
+- Add the following content:
+```
+:programname, isequal, "PasswordManager" /var/log/password-manager.log
+```
+- Reload the rsyslog service
+
+The log file might not get rotated, you can configure that with logrotate.
 
 #### Reverse proxy configuration
 I'm going to use the simplest configuration I can.

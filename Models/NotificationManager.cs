@@ -13,6 +13,7 @@ namespace PasswordManagerApp.Models
     public string SmtpHost { get; set; }
     public string EmailFrom { get; set; }
     public string EmailTo { get; set; }
+    public int SmtpPort { get; set; }
     private bool _notifications;
     public const string CauseLoginFailure = "LOGIN FAIL";
     public const string CauseLoginSuccess = "LOGIN SUCCESS";
@@ -27,7 +28,10 @@ namespace PasswordManagerApp.Models
         ?? "pwdmanager@localhost";
       EmailTo = config.GetValue<string>("mailTo") 
         ?? "root";
+      SmtpPort = config.GetValue<int>("smtpPort");
+      if (SmtpPort <= 0) SmtpPort = 25;
       _notifications = config.GetValue<bool>("notifications");
+      _logger.LogInformation($"Notifier configured with email host {SmtpHost} port {SmtpPort}");
       if (!_notifications) 
         _logger.LogWarning("Notification channels have been disabled by configuration");
     }
@@ -57,6 +61,7 @@ namespace PasswordManagerApp.Models
       try
       {
         SmtpClient client = new SmtpClient(SmtpHost);
+        client.Port = SmtpPort;
         //client.UseDefaultCredentials = false;
         MailMessage message = new MailMessage();
         message.From = new MailAddress(EmailFrom);
