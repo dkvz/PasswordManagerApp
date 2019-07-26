@@ -27,7 +27,6 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 0;
   margin: 0;
@@ -54,21 +53,18 @@ body > header {
   color: var(--light-color);
   background-color: var(--dark-color);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-  width: 100%;
 }
 
 body > footer {
   color: var(--light-color);
   background-color: var(--dark-color);
   box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.5);
-  width: 100%;
 }
 
 body > main {
   flex: 1;
   margin-top: 1rem;
   margin-bottom: 1rem;
-  width: 100%;
 }
 
 body > main, .flex-form, .sequence-grid, .slides-container > section {
@@ -355,5 +351,7 @@ select[size] {
 
   body > main {
     width: 760px;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
