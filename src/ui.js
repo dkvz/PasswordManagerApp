@@ -1,8 +1,8 @@
 export function showSuccessSlide(slides) {
   // We're expecting there to be just two of them even 
   // though the system is primed for more if needed.
-  slides[0].className = 'past';
-  slides[1].className = 'present';
+  slides[0].className = 'hidden';
+  slides[1].className = 'present-forward';
 }
 
 export function setLoading(element, isLoading) {
