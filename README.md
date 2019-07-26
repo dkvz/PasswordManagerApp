@@ -184,7 +184,7 @@ The app will only trust proxies calling from localhost. See [here](https://docs.
 ## Layout modifications
 I had to heavily modify the existing pages since I don't want Bootstrap, JQuery etc.
 
-The `_Layout.cshtml` file had these entries in head:
+Just to remember these tags exist, they were using environment tags to do different things according to the build stage:
 ```html
 <environment include="Development">
   <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -203,27 +203,7 @@ Then there's the cookie warning partial (lel):
 <partial name="_CookieConsentPartial" />
 ```
 
-And at the end of body the script tags:
-```html
-<environment include="Development">
-  <script src="~/lib/jquery/dist/jquery.js"></script>
-  <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
-</environment>
-<environment exclude="Development">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
-        asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
-        asp-fallback-test="window.jQuery"
-        crossorigin="anonymous"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=">
-  </script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
-        asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
-        asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
-        crossorigin="anonymous"
-        integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
-  </script>
-</environment>
-```
+I also disabled the cookie consent thing in Startup.cs. It appears in ConfigureServices and is then added as a middleware.
 
 ## Doing REST with Razor pages
 It's possible. Although you still need a "Controller". I think it's probably best to just use one these Controller things.
@@ -519,4 +499,5 @@ I'm going to add a todo post to try and get the HTTPS Kestrel support.
 - [ ] Rather than using Console.Error.WriteLine et al. in many places I should inject the ILogger and use that.
 - [ ] I should have some sort of error callback for the email notifications and/or add an API endpoint only available on localhost that sends a test email.
 - [ ] Limit the amount of data the process is logging onto the console in production.
-- [ ] Try to get kestrel to serve HTTPS with the Linux production build as well. For some reason it's not binding https://localhost:5001 with the self-contained Linux build.
+- [ ] Try to get kestrel to serve HTTPS with the Linux production build as well. For some reason it's not binding https://localhost:5001 with the self-contained Linux build. I have to test by running the dll with dotnet and not using the self-contained approach to see if that fixes it.
+- [ ] Version strategy?
